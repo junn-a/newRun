@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NewRun">
+<title>NewRun</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════ */
+:root {
+  --blue:       #2563EB;
+  --blue-dark:  #1d4ed8;
+  --blue-light: #eff6ff;
+  --blue-mid:   #dbeafe;
+  --blue-soft:  #93c5fd;
+  --sky:        #0ea5e9;
+  --bg:         #f8faff;
+  --surface:    #ffffff;
+  --surface2:   #f1f5ff;
+  --border:     #e2e8f0;
+  --border2:    #cbd5e1;
+  --text:       #0f172a;
+  --text2:      #475569;
+  --text3:      #94a3b8;
+  --green:      #10b981;
+  --orange:     #f59e0b;
+  --red:        #ef4444;
+  --shadow-sm:  0 1px 3px rgba(37,99,235,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow:     0 4px 16px rgba(37,99,235,.1), 0 2px 6px rgba(0,0,0,.05);
+  --shadow-lg:  0 12px 40px rgba(37,99,235,.15), 0 4px 12px rgba(0,0,0,.08);
+  --r:          16px;
+  --r-sm:       10px;
+  --sb:         env(safe-area-inset-bottom, 0px);
+  --st:         env(safe-area-inset-top, 0px);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; background:var(--bg); color:var(--text); font-family:'Plus Jakarta Sans', sans-serif; overflow:hidden; }
+
+/* ══════════════════════════════════════
+   SCREENS
+══════════════════════════════════════ */
+.screen { position:fixed; inset:0; display:flex; flex-direction:column; transition:opacity .3s, transform .3s; }
+.screen.hidden { opacity:0; pointer-events:none; transform:translateY(20px); }
+
+/* ══════════════════════════════════════
+   ① ONBOARDING
+══════════════════════════════════════ */
+#screen-onboard {
+  background: linear-gradient(160deg, #eff6ff 0%, #dbeafe 40%, #bfdbfe 100%);
+  align-items: center; justify-content: center; padding: 32px 28px;
+  gap: 0;
+}
+.ob-logo-wrap { display:flex; align-items:center; gap:10px; margin-bottom:48px; }
+.ob-logo-icon { width:48px; height:48px; background:var(--blue); border-radius:14px; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); }
+.ob-logo-icon svg { width:26px; height:26px; }
+.ob-logo-text { font-size:26px; font-weight:800; color:var(--text); letter-spacing:-.5px; }
+.ob-hero { font-size:36px; font-weight:800; color:var(--text); text-align:center; line-height:1.15; margin-bottom:12px; letter-spacing:-.8px; }
+.ob-hero span { color:var(--blue); }
+.ob-sub { font-size:15px; color:var(--text2); text-align:center; line-height:1.6; margin-bottom:40px; max-width:280px; }
+.ob-form { width:100%; max-width:320px; display:flex; flex-direction:column; gap:14px; }
+.ob-label { font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:.8px; margin-bottom:4px; }
+.ob-input {
+  width:100%; padding:16px 18px; border-radius:14px;
+  border:2px solid var(--border2); background:var(--surface);
+  font-family:'Plus Jakarta Sans', sans-serif; font-size:17px; font-weight:600; color:var(--text);
+  outline:none; transition:border-color .2s, box-shadow .2s;
+  box-shadow: var(--shadow-sm);
+}
+.ob-input:focus { border-color:var(--blue); box-shadow:0 0 0 4px rgba(37,99,235,.12); }
+.ob-input::placeholder { color:var(--text3); font-weight:500; }
+.ob-btn {
+  width:100%; padding:17px; border-radius:14px; border:none;
+  background:var(--blue); color:#fff;
+  font-family:'Plus Jakarta Sans', sans-serif; font-size:16px; font-weight:700;
+  cursor:pointer; transition:all .18s; letter-spacing:-.2px;
+  box-shadow:0 4px 20px rgba(37,99,235,.35);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.ob-btn:active { transform:scale(.97); background:var(--blue-dark); }
+.ob-btn:disabled { background:var(--border2); color:var(--text3); box-shadow:none; cursor:not-allowed; }
+.ob-features { display:flex; gap:16px; margin-top:8px; }
+.ob-feat { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text3); font-weight:600; }
+.ob-feat-dot { width:6px; height:6px; border-radius:50%; background:var(--blue); }
+
+/* ══════════════════════════════════════
+   ② HOME
+══════════════════════════════════════ */
+#screen-home { background:var(--bg); }
+.home-header {
+  padding: calc(var(--st) + 14px) 20px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  background:var(--surface); border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.home-logo { display:flex; align-items:center; gap:8px; }
+.logo-mark { width:32px; height:32px; background:var(--blue); border-radius:9px; display:flex; align-items:center; justify-content:center; }
+.logo-mark svg { width:18px; height:18px; }
+.logo-name { font-size:18px; font-weight:800; color:var(--text); letter-spacing:-.4px; }
+.home-greeting { font-size:13px; color:var(--text3); font-weight:500; }
+.home-av { width:36px; height:36px; border-radius:50%; background:var(--blue-light); border:2px solid var(--blue-mid); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; color:var(--blue); cursor:pointer; }
+
+.home-scroll { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.home-scroll::-webkit-scrollbar { display:none; }
+
+/* START RUN CTA */
+.start-cta {
+  margin:20px 16px; padding:24px 20px;
+  background:linear-gradient(135deg, var(--blue), #1e40af);
+  border-radius:20px; position:relative; overflow:hidden;
+  box-shadow:0 8px 32px rgba(37,99,235,.3);
+}
+.start-cta::before {
+  content:''; position:absolute; top:-30px; right:-20px;
+  width:120px; height:120px; border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+.start-cta::after {
+  content:''; position:absolute; bottom:-20px; right:40px;
+  width:70px; height:70px; border-radius:50%;
+  background:rgba(255,255,255,.05);
+}
+.cta-label { font-size:12px; font-weight:700; color:rgba(255,255,255,.65); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.cta-title { font-size:22px; font-weight:800; color:#fff; margin-bottom:16px; letter-spacing:-.4px; }
+.cta-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 22px; border-radius:50px; border:none;
+  background:#fff; color:var(--blue);
+  font-family:'Plus Jakarta Sans', sans-serif; font-size:14px; font-weight:800;
+  cursor:pointer; transition:all .18s;
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+}
+.cta-btn:active { transform:scale(.96); }
+.cta-btn svg { width:16px; height:16px; }
+
+/* STATS STRIP */
+.stats-strip { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:0 16px 20px; }
+.stat-tile {
+  background:var(--surface); border-radius:14px; padding:14px 12px;
+  border:1px solid var(--border); box-shadow:var(--shadow-sm);
+  text-align:center;
+}
+.st-val { font-size:20px; font-weight:800; color:var(--text); letter-spacing:-.5px; }
+.st-lbl { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.6px; margin-top:2px; }
+
+/* SECTION */
+.section-head { display:flex; align-items:center; justify-content:space-between; padding:0 16px 10px; }
+.section-title { font-size:15px; font-weight:800; color:var(--text); }
+.section-count { font-size:12px; color:var(--text3); font-weight:600; }
+
+/* POST CARD */
+.post-card {
+  margin:0 16px 14px; border-radius:20px; overflow:hidden;
+  background:var(--surface); border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+.post-card-story {
+  position:relative; height:420px; overflow:hidden;
+  background:linear-gradient(180deg,#0f172a,#1e293b);
+  cursor:pointer;
+}
+.post-story-photo {
+  position:absolute; inset:0; background-size:cover; background-position:center;
+  transition:transform .3s;
+}
+.post-card-story:active .post-story-photo { transform:scale(1.02); }
+.post-story-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to bottom, rgba(0,0,0,.1) 0%, transparent 30%, transparent 55%, rgba(0,0,0,.75) 100%);
+}
+.post-story-top { position:absolute; top:14px; left:14px; right:14px; display:flex; align-items:center; justify-content:space-between; }
+.post-story-user { display:flex; align-items:center; gap:8px; }
+.post-story-av { width:34px; height:34px; border-radius:50%; background:var(--blue); border:2px solid rgba(255,255,255,.4); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; }
+.post-story-nm { font-size:13px; font-weight:700; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,.4); }
+.post-story-dt { font-size:11px; color:rgba(255,255,255,.75); }
+.post-story-badge { background:rgba(255,255,255,.2); backdrop-filter:blur(8px); border-radius:20px; padding:5px 10px; font-size:11px; font-weight:700; color:#fff; display:flex; align-items:center; gap:4px; border:1px solid rgba(255,255,255,.2); }
+.post-story-bottom { position:absolute; bottom:14px; left:14px; right:14px; }
+.post-story-title { font-size:19px; font-weight:800; color:#fff; margin-bottom:10px; text-shadow:0 2px 8px rgba(0,0,0,.4); letter-spacing:-.3px; }
+.post-story-stats { display:flex; gap:12px; }
+.pss { background:rgba(255,255,255,.18); backdrop-filter:blur(8px); border-radius:10px; padding:8px 12px; border:1px solid rgba(255,255,255,.2); }
+.pss-val { font-size:16px; font-weight:800; color:#fff; font-family:'DM Mono', monospace; }
+.pss-lbl { font-size:9px; font-weight:700; color:rgba(255,255,255,.75); text-transform:uppercase; letter-spacing:.6px; margin-top:1px; }
+.post-mini-map { height:130px; border-top:1px solid var(--border); position:relative; }
+.post-mini-map .leaflet-container { background:#f8faff!important; }
+.post-footer { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; }
+.post-footer-left { display:flex; align-items:center; gap:14px; }
+.pf-btn { display:flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:var(--text2); border:none; background:none; cursor:pointer; padding:4px; font-family:inherit; transition:color .15s; }
+.pf-btn svg { width:18px; height:18px; }
+.pf-btn:active { color:var(--blue); }
+
+.empty-runs { display:flex; flex-direction:column; align-items:center; padding:40px 20px; gap:10px; }
+.empty-ico { width:64px; height:64px; border-radius:20px; background:var(--blue-light); display:flex; align-items:center; justify-content:center; }
+.empty-ico svg { width:32px; height:32px; color:var(--blue); }
+.empty-title { font-size:16px; font-weight:800; color:var(--text); }
+.empty-sub { font-size:13px; color:var(--text3); text-align:center; line-height:1.5; }
+
+/* ══════════════════════════════════════
+   ③ RUNNING (Live GPS)
+══════════════════════════════════════ */
+#screen-run { background:#fff; }
+.run-header {
+  padding: calc(var(--st) + 10px) 16px 10px;
+  display:flex; align-items:center; gap:12px;
+  background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.run-back { width:36px; height:36px; border-radius:50%; background:var(--surface2); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.run-back svg { width:18px; height:18px; color:var(--text); }
+.run-title { font-size:16px; font-weight:800; color:var(--text); flex:1; }
+.run-type-badge { font-size:11px; font-weight:700; color:var(--blue); background:var(--blue-light); padding:4px 10px; border-radius:20px; }
+
+/* MAP */
+#run-map { flex:1; min-height:0; position:relative; }
+#run-map .leaflet-container { background:#f0f4ff!important; height:100%!important; }
+#run-map .leaflet-tile { filter:saturate(0.6) brightness(1.05); }
+
+/* GPS status bar */
+.gps-bar {
+  position:absolute; top:10px; left:50%; transform:translateX(-50%);
+  z-index:1000; background:rgba(255,255,255,.95); backdrop-filter:blur(12px);
+  border-radius:20px; padding:7px 14px; display:flex; align-items:center; gap:7px;
+  font-size:12px; font-weight:700; color:var(--text2);
+  box-shadow:var(--shadow); border:1px solid var(--border); white-space:nowrap;
+  transition:all .3s;
+}
+.gps-led { width:8px; height:8px; border-radius:50%; background:var(--orange); flex-shrink:0; }
+.gps-led.locked { background:var(--green); animation:glow 2s infinite; }
+.gps-led.error { background:var(--red); }
+@keyframes glow { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)} 50%{box-shadow:0 0 0 5px rgba(16,185,129,0)} }
+
+/* Accuracy ring on map */
+/* Live stats panel */
+.live-panel {
+  background:var(--surface); border-top:1px solid var(--border);
+  flex-shrink:0; padding:0;
+}
+.live-stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; border-bottom:1px solid var(--border); }
+.lv { padding:14px 10px; text-align:center; }
+.lv + .lv { border-left:1px solid var(--border); }
+.lv-val { font-size:28px; font-weight:800; color:var(--text); font-family:'DM Mono', monospace; letter-spacing:-1px; line-height:1; }
+.lv-unit { font-size:11px; color:var(--text3); font-weight:600; margin-top:1px; }
+.lv-lbl { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.7px; margin-top:3px; }
+
+/* Controls */
+.run-controls { display:flex; align-items:center; justify-content:center; gap:20px; padding:16px 20px calc(16px + var(--sb)); background:var(--surface); }
+.rc { width:68px; height:68px; border-radius:50%; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s, box-shadow .15s; }
+.rc:active { transform:scale(.88); }
+.rc-start { background:var(--blue); box-shadow:0 6px 24px rgba(37,99,235,.4); }
+.rc-start svg { width:26px; height:26px; color:#fff; }
+.rc-stop { background:var(--red); box-shadow:0 6px 24px rgba(239,68,68,.35); }
+.rc-stop svg { width:26px; height:26px; color:#fff; }
+.rc-pause { background:var(--surface2); box-shadow:var(--shadow); }
+.rc-pause svg { width:24px; height:24px; color:var(--text); }
+.rc-sm { width:46px; height:46px; border-radius:50%; border:none; background:var(--surface2); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-sm); transition:transform .15s; }
+.rc-sm:active { transform:scale(.88); }
+.rc-sm svg { width:20px; height:20px; color:var(--text2); }
+
+/* ══════════════════════════════════════
+   ④ POST EDITOR
+══════════════════════════════════════ */
+#screen-post { background:var(--bg); overflow:hidden; }
+.post-editor-scroll { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.post-editor-scroll::-webkit-scrollbar { display:none; }
+
+.post-header {
+  padding: calc(var(--st) + 12px) 16px 12px;
+  display:flex; align-items:center; gap:12px;
+  background:var(--surface); border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.post-header-title { font-size:16px; font-weight:800; flex:1; }
+.post-publish-btn {
+  padding:8px 18px; border-radius:20px; border:none;
+  background:var(--blue); color:#fff;
+  font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+  box-shadow:0 2px 10px rgba(37,99,235,.3);
+  transition:all .15s;
+}
+.post-publish-btn:active { transform:scale(.96); background:var(--blue-dark); }
+
+/* Photo picker */
+.photo-zone {
+  margin:16px; border-radius:20px; overflow:hidden; position:relative;
+  height:300px; background:var(--surface2); border:2px dashed var(--border2);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; cursor:pointer; transition:border-color .2s, background .2s;
+}
+.photo-zone:active { background:var(--blue-light); border-color:var(--blue); }
+.photo-zone.has-photo { border-style:solid; border-color:var(--border); }
+.photo-zone-preview { position:absolute; inset:0; background-size:cover; background-position:center; }
+.photo-zone-overlay { position:absolute; inset:0; background:rgba(0,0,0,.35); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; opacity:0; transition:opacity .2s; }
+.photo-zone.has-photo:active .photo-zone-overlay { opacity:1; }
+.photo-placeholder { display:flex; flex-direction:column; align-items:center; gap:8px; }
+.photo-ico { width:52px; height:52px; border-radius:16px; background:var(--blue-light); display:flex; align-items:center; justify-content:center; }
+.photo-ico svg { width:26px; height:26px; color:var(--blue); }
+.photo-hint { font-size:14px; font-weight:700; color:var(--text2); }
+.photo-hint-sub { font-size:12px; color:var(--text3); }
+#photo-input { display:none; }
+
+/* Stats overlay preview */
+.story-preview {
+  margin:0 16px 14px; border-radius:20px; overflow:hidden;
+  box-shadow:var(--shadow-lg); position:relative; height:420px;
+  background:linear-gradient(180deg,#0f172a,#1e293b);
+}
+.sp-photo { position:absolute; inset:0; background-size:cover; background-position:center; }
+.sp-overlay { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,.08) 0%, transparent 30%, rgba(0,0,0,.7) 100%); }
+.sp-content { position:absolute; bottom:16px; left:16px; right:16px; }
+.sp-title-input {
+  font-size:20px; font-weight:800; color:#fff;
+  background:transparent; border:none; outline:none;
+  width:100%; font-family:'Plus Jakarta Sans', sans-serif;
+  text-shadow:0 2px 8px rgba(0,0,0,.5);
+  letter-spacing:-.3px; margin-bottom:10px;
+  border-bottom:1px solid rgba(255,255,255,.25); padding-bottom:6px;
+}
+.sp-title-input::placeholder { color:rgba(255,255,255,.5); }
+.sp-stats { display:flex; gap:8px; flex-wrap:wrap; }
+.sp-stat { background:rgba(255,255,255,.18); backdrop-filter:blur(8px); border-radius:10px; padding:8px 12px; border:1px solid rgba(255,255,255,.2); }
+.sp-stat-val { font-size:17px; font-weight:800; color:#fff; font-family:'DM Mono', monospace; }
+.sp-stat-lbl { font-size:9px; font-weight:700; color:rgba(255,255,255,.75); text-transform:uppercase; letter-spacing:.6px; margin-top:1px; }
+
+/* Route map in post editor */
+.route-map-section { margin:0 16px 14px; background:var(--surface); border-radius:16px; overflow:hidden; border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+.rms-header { padding:12px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.rms-title { font-size:13px; font-weight:700; }
+.rms-stats { display:flex; gap:16px; }
+.rms-stat { font-size:11px; color:var(--text3); font-weight:600; }
+.rms-stat strong { color:var(--text); font-weight:800; }
+#post-route-map { height:160px; }
+#post-route-map .leaflet-container { background:#f0f4ff!important; }
+#post-route-map .leaflet-tile { filter:saturate(0.55) brightness(1.1); }
+
+/* Caption */
+.caption-area { margin:0 16px 80px; }
+.caption-input {
+  width:100%; padding:14px; border-radius:14px;
+  border:1px solid var(--border); background:var(--surface);
+  font-family:'Plus Jakarta Sans', sans-serif; font-size:14px; color:var(--text);
+  outline:none; resize:none; transition:border-color .2s;
+  box-shadow:var(--shadow-sm);
+}
+.caption-input:focus { border-color:var(--blue); }
+.caption-input::placeholder { color:var(--text3); }
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast {
+  position:fixed; bottom:calc(100px + var(--sb)); left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--text); color:#fff; padding:11px 20px; border-radius:20px;
+  font-size:13px; font-weight:700; z-index:9999; opacity:0;
+  transition:all .25s; white-space:nowrap; pointer-events:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════
+   LEAFLET DARK MAP OVERRIDES
+══════════════════════════════════════ */
+.leaflet-control-attribution { display:none!important; }
+.leaflet-control-zoom { display:none!important; }
+
+/* ══════════════════════════════════════
+   MISC
+══════════════════════════════════════ */
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.fade-up { animation:fadeUp .35s ease forwards; }
+
+.divider { height:1px; background:var(--border); margin:4px 16px 16px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ ① ONBOARDING ══════════ -->
+<div class="screen" id="screen-onboard">
+  <div class="ob-logo-wrap">
+    <div class="ob-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <span class="ob-logo-text">NewRun</span>
+  </div>
+  <h1 class="ob-hero">Track every<br><span>kilometre.</span></h1>
+  <p class="ob-sub">Accurate GPS tracking, beautiful run stories, all in your pocket.</p>
+  <div class="ob-form">
+    <div>
+      <div class="ob-label">Your name</div>
+      <input class="ob-input" id="ob-name" placeholder="e.g. Alex" maxlength="24" oninput="checkOb()" autocomplete="off">
+    </div>
+    <button class="ob-btn" id="ob-start-btn" onclick="startApp()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Start Running
+    </button>
+  </div>
+  <div class="ob-features" style="margin-top:24px;">
+    <div class="ob-feat"><div class="ob-feat-dot"></div> Real GPS</div>
+    <div class="ob-feat"><div class="ob-feat-dot"></div> Live Map</div>
+    <div class="ob-feat"><div class="ob-feat-dot"></div> Run Stories</div>
+  </div>
+</div>
+
+<!-- ══════════ ② HOME ══════════ -->
+<div class="screen hidden" id="screen-home">
+  <div class="home-header">
+    <div class="home-logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <span class="logo-name">NewRun</span>
+    </div>
+    <span class="home-greeting" id="home-greeting">Good morning!</span>
+    <div class="home-av" id="home-av">A</div>
+  </div>
+
+  <div class="home-scroll">
+    <!-- CTA -->
+    <div class="start-cta fade-up">
+      <div class="cta-label">Ready?</div>
+      <div class="cta-title" id="cta-title">Let's go for a run</div>
+      <button class="cta-btn" onclick="goRun()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
+        Start Run
+      </button>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="stats-strip fade-up" id="stats-strip">
+      <div class="stat-tile"><div class="st-val" id="st-runs">0</div><div class="st-lbl">Runs</div></div>
+      <div class="stat-tile"><div class="st-val" id="st-km">0</div><div class="st-lbl">Total km</div></div>
+      <div class="stat-tile"><div class="st-val" id="st-kcal">0</div><div class="st-lbl">Calories</div></div>
+    </div>
+
+    <!-- Feed -->
+    <div class="section-head">
+      <div class="section-title">Your Runs</div>
+      <div class="section-count" id="runs-count"></div>
+    </div>
+    <div id="feed"></div>
+    <div style="height:20px;"></div>
+  </div>
+</div>
+
+<!-- ══════════ ③ RUNNING ══════════ -->
+<div class="screen hidden" id="screen-run">
+  <div class="run-header">
+    <button class="run-back" onclick="confirmEndRun()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <span class="run-title">Running</span>
+    <span class="run-type-badge">🏃 Outdoor</span>
+  </div>
+
+  <div id="run-map" style="flex:1;">
+    <div class="gps-bar" id="gps-bar">
+      <div class="gps-led" id="gps-led"></div>
+      <span id="gps-txt">Acquiring GPS…</span>
+    </div>
+  </div>
+
+  <div class="live-panel">
+    <div class="live-stats-row">
+      <div class="lv"><div class="lv-val" id="lv-dist">0.00</div><div class="lv-unit">km</div><div class="lv-lbl">Distance</div></div>
+      <div class="lv"><div class="lv-val" id="lv-time">00:00</div><div class="lv-unit"> </div><div class="lv-lbl">Duration</div></div>
+      <div class="lv"><div class="lv-val" id="lv-kcal">0</div><div class="lv-unit">kcal</div><div class="lv-lbl">Calories</div></div>
+    </div>
+    <div class="run-controls">
+      <button class="rc-sm" id="btn-recenter" onclick="recenterMap()" title="Re-center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+      <button class="rc rc-start" id="btn-start" onclick="beginRecording()">
+        <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+      </button>
+      <button class="rc rc-stop" id="btn-stop" onclick="stopRecording()" style="display:none">
+        <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+      </button>
+      <button class="rc rc-pause" id="btn-pause" onclick="togglePause()" style="display:none">
+        <svg viewBox="0 0 24 24" fill="currentColor" id="pause-icon"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+      </button>
+      <button class="rc-sm" id="btn-lock" onclick="toggleLock()" title="Lock screen" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="lock-icon"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ④ POST EDITOR ══════════ -->
+<div class="screen hidden" id="screen-post">
+  <div class="post-header">
+    <button class="run-back" onclick="discardPost()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    </button>
+    <span class="post-header-title">New Run Post</span>
+    <button class="post-publish-btn" onclick="publishPost()">Post ✓</button>
+  </div>
+
+  <div class="post-editor-scroll">
+    <!-- Photo picker -->
+    <div class="photo-zone" id="photo-zone" onclick="pickPhoto()">
+      <div class="photo-zone-preview" id="photo-preview" style="display:none"></div>
+      <div class="photo-zone-overlay" id="photo-overlay">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span style="font-size:13px;font-weight:700;color:#fff">Change Photo</span>
+      </div>
+      <div class="photo-placeholder" id="photo-placeholder">
+        <div class="photo-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        </div>
+        <div class="photo-hint">Add a photo</div>
+        <div class="photo-hint-sub">Tap to upload from camera roll</div>
+      </div>
+    </div>
+    <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="onPhotoSelected(event)">
+
+    <!-- Story preview (shows when photo selected) -->
+    <div id="story-preview-section" style="display:none">
+      <div class="story-preview" id="story-preview">
+        <div class="sp-photo" id="sp-photo"></div>
+        <div class="sp-overlay"></div>
+        <div class="sp-content">
+          <input class="sp-title-input" id="sp-title" placeholder="Give this run a name…" maxlength="50">
+          <div class="sp-stats" id="sp-stats"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Route map -->
+    <div class="route-map-section">
+      <div class="rms-header">
+        <span class="rms-title">Route</span>
+        <div class="rms-stats" id="rms-stats"></div>
+      </div>
+      <div id="post-route-map"></div>
+    </div>
+
+    <!-- Caption -->
+    <div class="caption-area">
+      <textarea class="caption-input" id="caption-input" rows="3" placeholder="How did the run feel? Add a note…"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ══════════════════════════════════════
+// STATE & STORAGE
+// ══════════════════════════════════════
+const LS_KEY = 'newrun_v1';
+
+function loadData() {
+  try { const d = localStorage.getItem(LS_KEY); return d ? JSON.parse(d) : null; }
+  catch(e) { return null; }
+}
+function saveData() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(DB)); } catch(e) {}
+}
+
+let DB = loadData() || { user: null, runs: [] };
+
+// ══════════════════════════════════════
+// SCREENS
+// ══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.toggle('hidden', s.id !== id);
+  });
+}
+
+// ══════════════════════════════════════
+// ONBOARDING
+// ══════════════════════════════════════
+function checkOb() {
+  const v = document.getElementById('ob-name').value.trim();
+  document.getElementById('ob-start-btn').disabled = v.length < 2;
+}
+
+function startApp() {
+  const name = document.getElementById('ob-name').value.trim();
+  if (name.length < 2) return;
+  DB.user = { name, initials: name.slice(0,2).toUpperCase() };
+  saveData();
+  initHome();
+  showScreen('screen-home');
+}
+
+// ══════════════════════════════════════
+// HOME
+// ══════════════════════════════════════
+function initHome() {
+  const u = DB.user;
+  if (!u) return;
+  // Greeting
+  const h = new Date().getHours();
+  const gr = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('home-greeting').textContent = `${gr}, ${u.name.split(' ')[0]}!`;
+  document.getElementById('home-av').textContent = u.initials;
+  // Stats
+  const runs = DB.runs;
+  const totalKm = runs.reduce((s,r) => s + (r.dist||0), 0);
+  const totalKcal = runs.reduce((s,r) => s + (r.kcal||0), 0);
+  document.getElementById('st-runs').textContent = runs.length;
+  document.getElementById('st-km').textContent = totalKm.toFixed(1);
+  document.getElementById('st-kcal').textContent = Math.round(totalKcal);
+  document.getElementById('runs-count').textContent = runs.length ? `${runs.length} total` : '';
+  // CTA title
+  document.getElementById('cta-title').textContent =
+    runs.length === 0 ? "Let's go for your first run" :
+    runs.length < 3  ? "Keep the streak going!" : "Ready for today's run?";
+  renderFeed();
+}
+
+function renderFeed() {
+  const c = document.getElementById('feed');
+  if (!DB.runs.length) {
+    c.innerHTML = `
+      <div class="empty-runs fade-up">
+        <div class="empty-ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="empty-title">No runs yet</div>
+        <div class="empty-sub">Hit "Start Run" to record your first run.<br>Your stories will appear here.</div>
+      </div>`;
+    return;
+  }
+  c.innerHTML = DB.runs.slice().reverse().map((r,i) => `
+    <div class="post-card fade-up" style="animation-delay:${i*0.06}s">
+      <div class="post-card-story" onclick="openRunDetail(${r.id})">
+        <div class="post-story-photo" style="${r.photo ? 'background-image:url('+r.photo+')' : 'background:linear-gradient(135deg,#1e3a5f,#1e40af)'}"></div>
+        <div class="post-story-overlay"></div>
+        <div class="post-story-top">
+          <div class="post-story-user">
+            <div class="post-story-av">${DB.user.initials}</div>
+            <div>
+              <div class="post-story-nm">${DB.user.name}</div>
+              <div class="post-story-dt">${fmtDate(r.date)}</div>
+            </div>
+          </div>
+          <div class="post-story-badge">🏃 Run</div>
+        </div>
+        <div class="post-story-bottom">
+          <div class="post-story-title">${r.title || 'Morning Run'}</div>
+          <div class="post-story-stats">
+            <div class="pss"><div class="pss-val">${r.dist.toFixed(2)}</div><div class="pss-lbl">km</div></div>
+            <div class="pss"><div class="pss-val">${fmtTime(r.duration)}</div><div class="pss-lbl">time</div></div>
+            <div class="pss"><div class="pss-val">${r.kcal}</div><div class="pss-lbl">kcal</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="post-mini-map" id="fmap-${r.id}"></div>
+      <div class="post-footer">
+        <div class="post-footer-left">
+          <button class="pf-btn" onclick="deleteRun(${r.id},event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19,6v14a2,2,0,01-2,2H7a2,2,0,01-2-2V6m3,0V4a1,1,0,011-1h4a1,1,0,011,1v2"/></svg>
+            Delete
+          </button>
+        </div>
+        <button class="pf-btn" onclick="shareRun(${r.id})">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  // Draw mini maps
+  setTimeout(() => {
+    DB.runs.slice().reverse().forEach(r => drawMiniMap('fmap-'+r.id, r.coords));
+  }, 100);
+}
+
+// Mini-map for feed cards
+const miniMaps = {};
+function drawMiniMap(id, coords) {
+  const el = document.getElementById(id);
+  if (!el || miniMaps[id] || !coords || coords.length < 2) return;
+  const map = L.map(el, { zoomControl:false, attributionControl:false, dragging:false, touchZoom:false, scrollWheelZoom:false, doubleClickZoom:false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18}).addTo(map);
+  const lls = coords.map(c => [c.lat, c.lng]);
+  const poly = L.polyline(lls, {color:'#2563EB', weight:3.5, opacity:.9}).addTo(map);
+  L.circleMarker(lls[0], {radius:5,fillColor:'#10b981',fillOpacity:1,color:'#fff',weight:2}).addTo(map);
+  L.circleMarker(lls[lls.length-1], {radius:5,fillColor:'#ef4444',fillOpacity:1,color:'#fff',weight:2}).addTo(map);
+  map.fitBounds(poly.getBounds(), {padding:[14,14]});
+  miniMaps[id] = map;
+}
+
+function deleteRun(id, e) {
+  e.stopPropagation();
+  if (!confirm('Delete this run?')) return;
+  DB.runs = DB.runs.filter(r => r.id !== id);
+  saveData();
+  initHome();
+  toast('🗑️ Run deleted');
+}
+
+function shareRun(id) {
+  const r = DB.runs.find(x => x.id === id);
+  if (!r) return;
+  const txt = `${r.title || 'Morning Run'} — ${r.dist.toFixed(2)}km in ${fmtTime(r.duration)} 🏃 via NewRun`;
+  if (navigator.share) navigator.share({ title:'NewRun', text:txt, url:window.location.href });
+  else { navigator.clipboard?.writeText(txt).then(() => toast('📋 Copied!')); }
+}
+
+// ══════════════════════════════════════
+// GPS RUNNING ENGINE
+// ══════════════════════════════════════
+let runMap = null, runPolyline = null, runMarker = null, runAccCircle = null;
+let recording = false, paused = false;
+let startTs = 0, elapsed = 0, pausedTotal = 0, pauseTs = 0;
+let totalDist = 0, totalKcal = 0;
+let trackCoords = [];           // [{lat,lng,ts,acc}]
+let watchId = null, timerInt = null;
+let isLocked = false;
+let lastGoodCoord = null;
+
+// GPS FILTER CONSTANTS — key to accuracy!
+const MIN_ACCURACY  = 20;   // metres — reject anything worse
+const MIN_DISTANCE  = 3;    // metres — minimum movement to add point
+const MAX_SPEED_MPS = 12;   // m/s (~43 km/h) — reject GPS teleport
+
+function goRun() {
+  showScreen('screen-run');
+  if (!runMap) initRunMap();
+}
+
+function initRunMap() {
+  const el = document.getElementById('run-map');
+  runMap = L.map(el, { zoomControl:false, attributionControl:false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(runMap);
+  runPolyline = L.polyline([], { color:'#2563EB', weight:5, opacity:.9, lineJoin:'round', lineCap:'round' }).addTo(runMap);
+
+  // Try to get initial position for map centering
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        runMap.setView([pos.coords.latitude, pos.coords.longitude], 17);
+        updateGpsStatus('ready', `GPS ready · ±${Math.round(pos.coords.accuracy)}m`);
+      },
+      err => {
+        runMap.setView([-6.2088, 106.8456], 14);
+        updateGpsStatus('error', 'GPS unavailable');
+      },
+      { enableHighAccuracy:true, timeout:10000, maximumAge:5000 }
+    );
+  } else {
+    runMap.setView([-6.2088, 106.8456], 14);
+    updateGpsStatus('error', 'GPS not supported');
+  }
+}
+
+function updateGpsStatus(state, text) {
+  const led = document.getElementById('gps-led');
+  const txt = document.getElementById('gps-txt');
+  led.className = 'gps-led' + (state === 'locked' ? ' locked' : state === 'error' ? ' error' : '');
+  txt.textContent = text;
+}
+
+function beginRecording() {
+  if (!navigator.geolocation) {
+    toast('❌ GPS not available'); return;
+  }
+  recording = true; paused = false;
+  startTs = Date.now(); elapsed = 0; pausedTotal = 0;
+  totalDist = 0; totalKcal = 0; trackCoords = []; lastGoodCoord = null;
+  runPolyline.setLatLngs([]);
+  if (runMarker) { runMarker.remove(); runMarker = null; }
+  if (runAccCircle) { runAccCircle.remove(); runAccCircle = null; }
+
+  document.getElementById('btn-start').style.display = 'none';
+  document.getElementById('btn-stop').style.display = 'flex';
+  document.getElementById('btn-pause').style.display = 'flex';
+  document.getElementById('btn-lock').style.display = 'flex';
+
+  updateGpsStatus('', 'Searching…');
+  toast('📍 Recording started!');
+
+  // Watch position with high accuracy
+  watchId = navigator.geolocation.watchPosition(
+    onGPSUpdate,
+    onGPSError,
+    { enableHighAccuracy:true, maximumAge:1000, timeout:15000 }
+  );
+
+  timerInt = setInterval(tickTimer, 1000);
+}
+
+function onGPSUpdate(pos) {
+  const { latitude:lat, longitude:lng, accuracy:acc, altitude:alt, speed:spd } = pos.coords;
+
+  // ── ACCURACY FILTER: discard poor signal ──
+  if (acc > MIN_ACCURACY) {
+    updateGpsStatus('', `Weak signal · ±${Math.round(acc)}m`);
+    return;
+  }
+
+  updateGpsStatus('locked', `GPS locked · ±${Math.round(acc)}m`);
+
+  // Show accuracy circle on map
+  if (runAccCircle) runAccCircle.remove();
+  runAccCircle = L.circle([lat, lng], { radius:acc, color:'#2563EB', fillColor:'#93c5fd', fillOpacity:.15, weight:1, opacity:.4 }).addTo(runMap);
+
+  // Move position marker
+  if (runMarker) runMarker.remove();
+  runMarker = L.circleMarker([lat, lng], { radius:9, fillColor:'#2563EB', fillOpacity:1, color:'#fff', weight:3 }).addTo(runMap);
+
+  if (!recording || paused) return;
+
+  // ── DISTANCE & SPEED FILTER ──
+  if (lastGoodCoord) {
+    const d = haversine(lastGoodCoord.lat, lastGoodCoord.lng, lat, lng);  // metres
+    const dt = (pos.timestamp - lastGoodCoord.ts) / 1000;                 // seconds
+    const speedMps = dt > 0 ? d / dt : 0;
+
+    // Reject teleport (GPS jump)
+    if (speedMps > MAX_SPEED_MPS) {
+      console.log(`GPS jump rejected: ${speedMps.toFixed(1)} m/s`);
+      return;
+    }
+
+    // Reject micro jitter (< MIN_DISTANCE metres)
+    if (d < MIN_DISTANCE) return;
+
+    totalDist += d / 1000; // km
+  }
+
+  lastGoodCoord = { lat, lng, ts: pos.timestamp };
+  trackCoords.push({ lat, lng, ts: pos.timestamp, acc });
+
+  // Update polyline
+  runPolyline.setLatLngs(trackCoords.map(c => [c.lat, c.lng]));
+  runMap.setView([lat, lng], 17, { animate:true, pan:{ duration:.4 } });
+
+  // Calories: ~60 kcal/km (average runner)
+  totalKcal = Math.round(totalDist * 60);
+  document.getElementById('lv-dist').textContent = totalDist.toFixed(2);
+  document.getElementById('lv-kcal').textContent = totalKcal;
+}
+
+function onGPSError(err) {
+  const m = { 1:'GPS permission denied — check browser settings', 2:'GPS signal lost', 3:'GPS timeout — finding signal…' };
+  updateGpsStatus('error', m[err.code] || 'GPS error');
+  if (err.code === 1) toast('❌ Allow location access to track your run');
+}
+
+function tickTimer() {
+  if (!recording || paused) return;
+  elapsed = Math.floor((Date.now() - startTs - pausedTotal) / 1000);
+  document.getElementById('lv-time').textContent = fmtTime(elapsed);
+}
+
+function togglePause() {
+  if (!paused) {
+    paused = true; pauseTs = Date.now();
+    document.getElementById('pause-icon').innerHTML = '<polygon points="5,3 19,12 5,21" fill="currentColor"/>';
+    updateGpsStatus('', 'Paused');
+    toast('⏸ Paused');
+  } else {
+    paused = false; pausedTotal += Date.now() - pauseTs;
+    document.getElementById('pause-icon').innerHTML = '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';
+    updateGpsStatus('locked', 'Resumed');
+    toast('▶ Resumed');
+  }
+}
+
+function stopRecording() {
+  if (!confirm('End this run?')) return;
+  clearInterval(timerInt);
+  if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+  recording = false;
+
+  // Go to post editor
+  openPostEditor();
+}
+
+function recenterMap() {
+  if (lastGoodCoord) runMap.setView([lastGoodCoord.lat, lastGoodCoord.lng], 17, { animate:true });
+}
+
+function toggleLock() {
+  isLocked = !isLocked;
+  const icon = document.getElementById('lock-icon');
+  if (isLocked) {
+    icon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>';
+    toast('🔒 Screen locked');
+  } else {
+    toast('🔓 Screen unlocked');
+  }
+}
+
+function confirmEndRun() {
+  if (recording) {
+    if (!confirm('Stop the run and go back?')) return;
+    clearInterval(timerInt);
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    recording = false;
+    resetRunUI();
+  }
+  showScreen('screen-home');
+}
+
+function resetRunUI() {
+  document.getElementById('btn-start').style.display = 'flex';
+  document.getElementById('btn-stop').style.display = 'none';
+  document.getElementById('btn-pause').style.display = 'none';
+  document.getElementById('btn-lock').style.display = 'none';
+  document.getElementById('lv-dist').textContent = '0.00';
+  document.getElementById('lv-time').textContent = '00:00';
+  document.getElementById('lv-kcal').textContent = '0';
+  if (runPolyline) runPolyline.setLatLngs([]);
+  if (runMarker) { runMarker.remove(); runMarker = null; }
+  if (runAccCircle) { runAccCircle.remove(); runAccCircle = null; }
+  totalDist = 0; elapsed = 0; totalKcal = 0; trackCoords = [];
+  updateGpsStatus('', 'Acquiring GPS…');
+  document.getElementById('gps-led').className = 'gps-led';
+}
+
+// ══════════════════════════════════════
+// POST EDITOR
+// ══════════════════════════════════════
+let postPhotoDataUrl = null;
+let postRouteMap = null;
+
+function openPostEditor() {
+  postPhotoDataUrl = null;
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-placeholder').style.display = 'flex';
+  document.getElementById('photo-zone').classList.remove('has-photo');
+  document.getElementById('story-preview-section').style.display = 'none';
+  document.getElementById('sp-title').value = '';
+  document.getElementById('caption-input').value = '';
+
+  // Fill in stats for the story card
+  const statsHtml = `
+    <div class="sp-stat"><div class="sp-stat-val">${totalDist.toFixed(2)}</div><div class="sp-stat-lbl">km</div></div>
+    <div class="sp-stat"><div class="sp-stat-val">${fmtTime(elapsed)}</div><div class="sp-stat-lbl">time</div></div>
+    <div class="sp-stat"><div class="sp-stat-val">${totalKcal}</div><div class="sp-stat-lbl">kcal</div></div>
+  `;
+  document.getElementById('sp-stats').innerHTML = statsHtml;
+
+  // Route stats
+  document.getElementById('rms-stats').innerHTML = `
+    <span class="rms-stat"><strong>${totalDist.toFixed(2)} km</strong></span>
+    <span class="rms-stat"><strong>${fmtTime(elapsed)}</strong></span>
+  `;
+
+  // Draw route map
+  if (postRouteMap) { postRouteMap.remove(); postRouteMap = null; }
+  const el = document.getElementById('post-route-map');
+  el.innerHTML = '';
+  postRouteMap = L.map(el, { zoomControl:false, attributionControl:false, dragging:false, touchZoom:false, scrollWheelZoom:false, doubleClickZoom:false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18}).addTo(postRouteMap);
+
+  if (trackCoords.length >= 2) {
+    const lls = trackCoords.map(c => [c.lat, c.lng]);
+    const poly = L.polyline(lls, {color:'#2563EB', weight:4, opacity:.9}).addTo(postRouteMap);
+    L.circleMarker(lls[0], {radius:6,fillColor:'#10b981',fillOpacity:1,color:'#fff',weight:2}).addTo(postRouteMap);
+    L.circleMarker(lls[lls.length-1], {radius:6,fillColor:'#ef4444',fillOpacity:1,color:'#fff',weight:2}).addTo(postRouteMap);
+    postRouteMap.fitBounds(poly.getBounds(), {padding:[16,16]});
+  } else {
+    postRouteMap.setView([-6.2088, 106.8456], 13);
+  }
+
+  showScreen('screen-post');
+  setTimeout(() => postRouteMap.invalidateSize(), 200);
+}
+
+function pickPhoto() {
+  document.getElementById('photo-input').click();
+}
+
+function onPhotoSelected(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    postPhotoDataUrl = ev.target.result;
+    // Show in photo zone
+    const prev = document.getElementById('photo-preview');
+    prev.style.backgroundImage = `url(${postPhotoDataUrl})`;
+    prev.style.display = 'block';
+    document.getElementById('photo-placeholder').style.display = 'none';
+    document.getElementById('photo-zone').classList.add('has-photo');
+    // Show in story preview
+    document.getElementById('sp-photo').style.backgroundImage = `url(${postPhotoDataUrl})`;
+    document.getElementById('story-preview-section').style.display = 'block';
+    document.getElementById('photo-zone').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+function discardPost() {
+  if (!confirm('Discard this run post?')) return;
+  resetRunUI();
+  showScreen('screen-home');
+}
+
+function publishPost() {
+  const title = document.getElementById('sp-title').value.trim() || suggestTitle();
+  const run = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    title,
+    dist: parseFloat(totalDist.toFixed(3)),
+    duration: elapsed,
+    kcal: totalKcal,
+    coords: trackCoords.map(c => ({ lat:c.lat, lng:c.lng })),
+    photo: postPhotoDataUrl || null,
+    caption: document.getElementById('caption-input').value.trim()
+  };
+  DB.runs.push(run);
+  saveData();
+  resetRunUI();
+  initHome();
+  showScreen('screen-home');
+  toast('🎉 Run posted!');
+}
+
+function suggestTitle() {
+  const h = new Date().getHours();
+  if (h < 7)  return 'Early Morning Run';
+  if (h < 12) return 'Morning Run';
+  if (h < 15) return 'Midday Run';
+  if (h < 19) return 'Afternoon Run';
+  return 'Evening Run';
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+function haversine(lat1, lon1, lat2, lon2) {
+  // Returns METRES
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function fmtTime(s) {
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+function fmtDate(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) return `${Math.floor(diff/60000)}m ago`;
+  if (diff < 86400000) return 'Today ' + d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  if (diff < 172800000) return 'Yesterday';
+  return d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
+}
+
+let toastTm = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  if (toastTm) clearTimeout(toastTm);
+  toastTm = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+window.addEventListener('load', () => {
+  if (DB.user) {
+    initHome();
+    showScreen('screen-home');
+  } else {
+    showScreen('screen-onboard');
+  }
+
+  // Service Worker
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+const C='newrun-v1';
+const A=['./'];
+self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>Promise.allSettled(A.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()));});
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('fetch',e=>{
+  if(new URL(e.request.url).hostname.includes('tile.openstreetmap.org')){
+    e.respondWith(caches.open('tiles-v1').then(async c=>{const cv=await c.match(e.request);if(cv)return cv;try{const r=await fetch(e.request);c.put(e.request,r.clone());return r;}catch{return cv||new Response('',{status:503});}}));
+    return;
+  }
+  e.respondWith(caches.match(e.request).then(cv=>{if(cv)return cv;return fetch(e.request).then(r=>{if(r.ok){const cl=r.clone();caches.open(C).then(c=>c.put(e.request,cl));}return r;}).catch(()=>caches.match('./'));}));
+});`;
+    const blob = new Blob([swCode], {type:'text/javascript'});
+    const url = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(() => {});
+  }
+});
+</script>
+</body>
+</html>
