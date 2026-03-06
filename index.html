@@ -499,30 +499,47 @@ html, body { height:100%; background:var(--bg); color:var(--text); font-family:'
   </div>
 
   <div class="post-editor-scroll">
-    <!-- Photo picker -->
-    <div class="photo-zone" id="photo-zone" onclick="pickPhoto()">
-      <div class="photo-zone-preview" id="photo-preview" style="display:none"></div>
-      <div class="photo-zone-overlay" id="photo-overlay">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span style="font-size:13px;font-weight:700;color:#fff">Change Photo</span>
+    <!-- Photo picker — camera OR gallery -->
+    <div style="margin:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Add Photo</div>
+      <div style="display:flex;gap:10px;" id="photo-btns">
+        <button onclick="pickPhotoSource('camera')" style="flex:1;padding:16px 10px;border-radius:14px;border:2px solid var(--border2);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;transition:all .15s;" id="btn-camera">
+          <div style="width:40px;height:40px;border-radius:12px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--text2);">Camera</span>
+        </button>
+        <button onclick="pickPhotoSource('gallery')" style="flex:1;padding:16px 10px;border-radius:14px;border:2px solid var(--border2);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;transition:all .15s;" id="btn-gallery">
+          <div style="width:40px;height:40px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--text2);">Gallery</span>
+        </button>
+        <button onclick="skipPhoto()" style="flex:1;padding:16px 10px;border-radius:14px;border:2px dashed var(--border);background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:inherit;transition:all .15s;" id="btn-skip">
+          <div style="width:40px;height:40px;border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:var(--text3);">No photo</span>
+        </button>
       </div>
-      <div class="photo-placeholder" id="photo-placeholder">
-        <div class="photo-ico">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
-        </div>
-        <div class="photo-hint">Add a photo</div>
-        <div class="photo-hint-sub">Tap to upload from camera roll</div>
+      <!-- Photo preview thumbnail after selection -->
+      <div id="photo-selected-preview" style="display:none;margin-top:10px;position:relative;border-radius:14px;overflow:hidden;height:160px;background:var(--surface2);">
+        <div id="photo-selected-img" style="width:100%;height:100%;background-size:cover;background-position:center;"></div>
+        <button onclick="clearPhoto()" style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.5);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;">✕</button>
+        <div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.5);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;">Photo added ✓</div>
       </div>
     </div>
-    <input type="file" id="photo-input" accept="image/*" capture="environment" onchange="onPhotoSelected(event)">
+    <input type="file" id="photo-input-camera" accept="image/*" capture="environment" onchange="onPhotoSelected(event)">
+    <input type="file" id="photo-input-gallery" accept="image/*" onchange="onPhotoSelected(event)">
 
-    <!-- Story preview (shows when photo selected) -->
-    <div id="story-preview-section" style="display:none">
+    <!-- Story preview — ALWAYS visible, photo is optional background -->
+    <div style="margin:0 16px 14px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Story Preview</div>
       <div class="story-preview" id="story-preview">
-        <div class="sp-photo" id="sp-photo"></div>
+        <div class="sp-photo" id="sp-photo" style="background:linear-gradient(160deg,#1e3a5f,#1e40af);"></div>
         <div class="sp-overlay"></div>
         <div class="sp-content">
-          <input class="sp-title-input" id="sp-title" placeholder="Give this run a name…" maxlength="50">
+          <input class="sp-title-input" id="sp-title" placeholder="Name this run…" maxlength="50">
           <div class="sp-stats" id="sp-stats"></div>
         </div>
       </div>
@@ -631,8 +648,10 @@ function renderFeed() {
   }
   c.innerHTML = DB.runs.slice().reverse().map((r,i) => `
     <div class="post-card fade-up" style="animation-delay:${i*0.06}s">
-      <div class="post-card-story" onclick="openRunDetail(${r.id})">
-        <div class="post-story-photo" style="${r.photo ? 'background-image:url('+r.photo+')' : 'background:linear-gradient(135deg,#1e3a5f,#1e40af)'}"></div>
+      <!-- Story photo section (only if has photo) -->
+      ${r.photo ? `
+      <div class="post-card-story">
+        <div class="post-story-photo" style="background-image:url(${r.photo})"></div>
         <div class="post-story-overlay"></div>
         <div class="post-story-top">
           <div class="post-story-user">
@@ -652,8 +671,41 @@ function renderFeed() {
             <div class="pss"><div class="pss-val">${r.kcal}</div><div class="pss-lbl">kcal</div></div>
           </div>
         </div>
+      </div>` : `
+      <!-- No photo: show header + stats only -->
+      <div style="padding:14px 16px 10px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div class="post-story-av" style="width:38px;height:38px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;">${DB.user.initials}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:var(--text);">${DB.user.name}</div>
+            <div style="font-size:11px;color:var(--text3);">${fmtDate(r.date)}</div>
+          </div>
+          <div class="post-story-badge" style="background:var(--blue-light);color:var(--blue);border:none;">🏃 Run</div>
+        </div>
+        <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:12px;">${r.title || 'Morning Run'}</div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;background:var(--blue-light);border-radius:12px;padding:10px;text-align:center;">
+            <div style="font-size:18px;font-weight:800;color:var(--blue);font-family:'DM Mono',monospace;">${r.dist.toFixed(2)}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">km</div>
+          </div>
+          <div style="flex:1;background:var(--surface2);border-radius:12px;padding:10px;text-align:center;">
+            <div style="font-size:18px;font-weight:800;color:var(--text);font-family:'DM Mono',monospace;">${fmtTime(r.duration)}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">time</div>
+          </div>
+          <div style="flex:1;background:var(--surface2);border-radius:12px;padding:10px;text-align:center;">
+            <div style="font-size:18px;font-weight:800;color:var(--text);font-family:'DM Mono',monospace;">${r.kcal}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;">kcal</div>
+          </div>
+        </div>
+      </div>`}
+      <!-- Route map — ALWAYS shown -->
+      <div style="border-top:1px solid var(--border);">
+        <div style="padding:10px 14px 6px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;">Route</span>
+          ${r.coords && r.coords.length > 1 ? `<span style="font-size:11px;color:var(--text3);font-weight:600;">${r.coords.length} points tracked</span>` : '<span style="font-size:11px;color:var(--text3);">No GPS data</span>'}
+        </div>
+        <div class="post-mini-map" id="fmap-${r.id}" style="height:170px;"></div>
       </div>
-      <div class="post-mini-map" id="fmap-${r.id}"></div>
       <div class="post-footer">
         <div class="post-footer-left">
           <button class="pf-btn" onclick="deleteRun(${r.id},event)">
@@ -669,24 +721,38 @@ function renderFeed() {
     </div>
   `).join('');
 
-  // Draw mini maps
+  // Draw mini maps — always, even if no coords (show plain map)
   setTimeout(() => {
-    DB.runs.slice().reverse().forEach(r => drawMiniMap('fmap-'+r.id, r.coords));
-  }, 100);
+    DB.runs.slice().reverse().forEach(r => drawMiniMap('fmap-'+r.id, r.coords, r.centerLat, r.centerLng));
+  }, 150);
 }
 
-// Mini-map for feed cards
+// Mini-map for feed cards — always renders, shows route if available
 const miniMaps = {};
-function drawMiniMap(id, coords) {
+function drawMiniMap(id, coords, fallbackLat, fallbackLng) {
   const el = document.getElementById(id);
-  if (!el || miniMaps[id] || !coords || coords.length < 2) return;
-  const map = L.map(el, { zoomControl:false, attributionControl:false, dragging:false, touchZoom:false, scrollWheelZoom:false, doubleClickZoom:false });
+  if (!el || miniMaps[id]) return;
+  const map = L.map(el, { zoomControl:false, attributionControl:false, dragging:false, touchZoom:false, scrollWheelZoom:false, doubleClickZoom:false, boxZoom:false, keyboard:false });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:18}).addTo(map);
-  const lls = coords.map(c => [c.lat, c.lng]);
-  const poly = L.polyline(lls, {color:'#2563EB', weight:3.5, opacity:.9}).addTo(map);
-  L.circleMarker(lls[0], {radius:5,fillColor:'#10b981',fillOpacity:1,color:'#fff',weight:2}).addTo(map);
-  L.circleMarker(lls[lls.length-1], {radius:5,fillColor:'#ef4444',fillOpacity:1,color:'#fff',weight:2}).addTo(map);
-  map.fitBounds(poly.getBounds(), {padding:[14,14]});
+
+  if (coords && coords.length >= 2) {
+    const lls = coords.map(c => [c.lat, c.lng]);
+    const poly = L.polyline(lls, {color:'#2563EB', weight:4, opacity:.9, lineJoin:'round', lineCap:'round'}).addTo(map);
+    L.circleMarker(lls[0], {radius:6,fillColor:'#10b981',fillOpacity:1,color:'#fff',weight:2.5}).addTo(map);
+    L.circleMarker(lls[lls.length-1], {radius:6,fillColor:'#ef4444',fillOpacity:1,color:'#fff',weight:2.5}).addTo(map);
+    map.fitBounds(poly.getBounds(), {padding:[18,18]});
+  } else if (coords && coords.length === 1) {
+    map.setView([coords[0].lat, coords[0].lng], 16);
+    L.circleMarker([coords[0].lat, coords[0].lng], {radius:8,fillColor:'#2563EB',fillOpacity:1,color:'#fff',weight:3}).addTo(map);
+  } else {
+    // No GPS data — show fallback location or Jakarta
+    const lat = fallbackLat || -6.2088;
+    const lng = fallbackLng || 106.8456;
+    map.setView([lat, lng], 14);
+    // Show "no route" label
+    const noRoute = L.divIcon({ html:'<div style="background:rgba(255,255,255,.9);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#94a3b8;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.1);">No GPS route recorded</div>', iconAnchor:[75,16], className:'' });
+    L.marker([lat, lng], {icon:noRoute}).addTo(map);
+  }
   miniMaps[id] = map;
 }
 
@@ -928,28 +994,28 @@ let postRouteMap = null;
 
 function openPostEditor() {
   postPhotoDataUrl = null;
-  document.getElementById('photo-preview').style.display = 'none';
-  document.getElementById('photo-placeholder').style.display = 'flex';
-  document.getElementById('photo-zone').classList.remove('has-photo');
-  document.getElementById('story-preview-section').style.display = 'none';
-  document.getElementById('sp-title').value = '';
+  // Reset photo UI
+  document.getElementById('photo-selected-preview').style.display = 'none';
+  document.getElementById('photo-btns').style.display = 'flex';
+  document.getElementById('sp-photo').style.backgroundImage = '';
+  document.getElementById('sp-photo').style.background = 'linear-gradient(160deg,#1e3a5f,#1e40af)';
+  document.getElementById('sp-title').value = suggestTitle();
   document.getElementById('caption-input').value = '';
 
-  // Fill in stats for the story card
-  const statsHtml = `
+  // Stats overlay in story preview
+  document.getElementById('sp-stats').innerHTML = `
     <div class="sp-stat"><div class="sp-stat-val">${totalDist.toFixed(2)}</div><div class="sp-stat-lbl">km</div></div>
     <div class="sp-stat"><div class="sp-stat-val">${fmtTime(elapsed)}</div><div class="sp-stat-lbl">time</div></div>
     <div class="sp-stat"><div class="sp-stat-val">${totalKcal}</div><div class="sp-stat-lbl">kcal</div></div>
   `;
-  document.getElementById('sp-stats').innerHTML = statsHtml;
 
-  // Route stats
+  // Route stats bar
   document.getElementById('rms-stats').innerHTML = `
     <span class="rms-stat"><strong>${totalDist.toFixed(2)} km</strong></span>
     <span class="rms-stat"><strong>${fmtTime(elapsed)}</strong></span>
   `;
 
-  // Draw route map
+  // Build route map
   if (postRouteMap) { postRouteMap.remove(); postRouteMap = null; }
   const el = document.getElementById('post-route-map');
   el.innerHTML = '';
@@ -958,40 +1024,80 @@ function openPostEditor() {
 
   if (trackCoords.length >= 2) {
     const lls = trackCoords.map(c => [c.lat, c.lng]);
-    const poly = L.polyline(lls, {color:'#2563EB', weight:4, opacity:.9}).addTo(postRouteMap);
-    L.circleMarker(lls[0], {radius:6,fillColor:'#10b981',fillOpacity:1,color:'#fff',weight:2}).addTo(postRouteMap);
-    L.circleMarker(lls[lls.length-1], {radius:6,fillColor:'#ef4444',fillOpacity:1,color:'#fff',weight:2}).addTo(postRouteMap);
-    postRouteMap.fitBounds(poly.getBounds(), {padding:[16,16]});
+    const poly = L.polyline(lls, {color:'#2563EB', weight:5, opacity:.9, lineJoin:'round', lineCap:'round'}).addTo(postRouteMap);
+    L.circleMarker(lls[0], {radius:7,fillColor:'#10b981',fillOpacity:1,color:'#fff',weight:2.5}).addTo(postRouteMap);
+    L.circleMarker(lls[lls.length-1], {radius:7,fillColor:'#ef4444',fillOpacity:1,color:'#fff',weight:2.5}).addTo(postRouteMap);
+    postRouteMap.fitBounds(poly.getBounds(), {padding:[20,20]});
+  } else if (lastGoodCoord) {
+    postRouteMap.setView([lastGoodCoord.lat, lastGoodCoord.lng], 15);
+    L.circleMarker([lastGoodCoord.lat, lastGoodCoord.lng], {radius:8,fillColor:'#2563EB',fillOpacity:1,color:'#fff',weight:3}).addTo(postRouteMap);
   } else {
     postRouteMap.setView([-6.2088, 106.8456], 13);
   }
 
   showScreen('screen-post');
-  setTimeout(() => postRouteMap.invalidateSize(), 200);
+  setTimeout(() => postRouteMap && postRouteMap.invalidateSize(), 250);
 }
 
-function pickPhoto() {
-  document.getElementById('photo-input').click();
+function pickPhotoSource(source) {
+  if (source === 'camera') {
+    document.getElementById('photo-input-camera').click();
+  } else {
+    document.getElementById('photo-input-gallery').click();
+  }
+}
+
+function clearPhoto() {
+  postPhotoDataUrl = null;
+  document.getElementById('photo-selected-preview').style.display = 'none';
+  document.getElementById('photo-btns').style.display = 'flex';
+  document.getElementById('sp-photo').style.backgroundImage = '';
+  document.getElementById('sp-photo').style.background = 'linear-gradient(160deg,#1e3a5f,#1e40af)';
+  // Reset file inputs
+  document.getElementById('photo-input-camera').value = '';
+  document.getElementById('photo-input-gallery').value = '';
+}
+
+function skipPhoto() {
+  postPhotoDataUrl = null;
+  document.getElementById('photo-selected-preview').style.display = 'none';
+  document.getElementById('sp-photo').style.backgroundImage = '';
+  document.getElementById('sp-photo').style.background = 'linear-gradient(160deg,#1e3a5f,#1e40af)';
+  toast('📝 Post without photo');
 }
 
 function onPhotoSelected(e) {
   const file = e.target.files[0];
   if (!file) return;
+  // Compress large photos before storing
   const reader = new FileReader();
   reader.onload = ev => {
-    postPhotoDataUrl = ev.target.result;
-    // Show in photo zone
-    const prev = document.getElementById('photo-preview');
-    prev.style.backgroundImage = `url(${postPhotoDataUrl})`;
-    prev.style.display = 'block';
-    document.getElementById('photo-placeholder').style.display = 'none';
-    document.getElementById('photo-zone').classList.add('has-photo');
-    // Show in story preview
-    document.getElementById('sp-photo').style.backgroundImage = `url(${postPhotoDataUrl})`;
-    document.getElementById('story-preview-section').style.display = 'block';
-    document.getElementById('photo-zone').style.display = 'none';
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxW = 1080, maxH = 1920;
+      let w = img.width, h = img.height;
+      if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+      if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      postPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      applyPhoto(postPhotoDataUrl);
+    };
+    img.src = ev.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+function applyPhoto(dataUrl) {
+  // Show thumbnail in picker
+  document.getElementById('photo-selected-img').style.backgroundImage = `url(${dataUrl})`;
+  document.getElementById('photo-selected-preview').style.display = 'block';
+  document.getElementById('photo-btns').style.display = 'none';
+  // Apply to story preview
+  document.getElementById('sp-photo').style.background = '';
+  document.getElementById('sp-photo').style.backgroundImage = `url(${dataUrl})`;
+  toast('📸 Photo added!');
 }
 
 function discardPost() {
@@ -1002,6 +1108,7 @@ function discardPost() {
 
 function publishPost() {
   const title = document.getElementById('sp-title').value.trim() || suggestTitle();
+  const centerCoord = trackCoords.length > 0 ? trackCoords[Math.floor(trackCoords.length/2)] : lastGoodCoord;
   const run = {
     id: Date.now(),
     date: new Date().toISOString(),
@@ -1010,12 +1117,16 @@ function publishPost() {
     duration: elapsed,
     kcal: totalKcal,
     coords: trackCoords.map(c => ({ lat:c.lat, lng:c.lng })),
+    centerLat: centerCoord ? centerCoord.lat : null,
+    centerLng: centerCoord ? centerCoord.lng : null,
     photo: postPhotoDataUrl || null,
     caption: document.getElementById('caption-input').value.trim()
   };
   DB.runs.push(run);
   saveData();
   resetRunUI();
+  // Invalidate mini map cache for new run
+  delete miniMaps['fmap-'+run.id];
   initHome();
   showScreen('screen-home');
   toast('🎉 Run posted!');
