@@ -106,6 +106,9 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
 .gps-led{width:8px;height:8px;border-radius:50%;background:var(--org);flex-shrink:0}
 .gps-led.locked{background:var(--grn);animation:glow 2s infinite}
 .gps-led.err{background:var(--red)}
+/* WAKELOCK badge */
+.wl-badge{position:absolute;top:10px;right:10px;z-index:1000;background:rgba(16,185,129,.9);backdrop-filter:blur(8px);border-radius:20px;padding:5px 10px;font-size:10px;font-weight:700;color:#fff;display:none;align-items:center;gap:5px}
+.wl-badge.on{display:flex}
 @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.4)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0)}}
 .live-panel{background:var(--sur);border-top:1px solid var(--bdr);flex-shrink:0}
 .lv-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--bdr)}
@@ -144,6 +147,36 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
 .share-btn{width:100%;padding:15px;border-radius:14px;border:none;background:linear-gradient(135deg,#1d4ed8,#2563EB);color:#fff;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(37,99,235,.35);transition:transform .15s}
 .share-btn:active{transform:scale(.97)}
 
+/* ── DRAG & DROP CARD BUILDER ── */
+.builder-wrap{margin:0 16px 14px}
+.builder-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:9px}
+.builder-note{font-size:10px;color:var(--t3);margin-bottom:8px;line-height:1.4}
+.builder-list{display:flex;flex-direction:column;gap:6px;min-height:40px;border:2px dashed var(--bdr);border-radius:14px;padding:8px;background:var(--s2)}
+.builder-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:var(--sur);border:1px solid var(--bdr);cursor:grab;user-select:none;transition:box-shadow .15s,opacity .15s;position:relative}
+.builder-item:active{cursor:grabbing}
+.builder-item.dragging{opacity:.4;box-shadow:none}
+.builder-item.drag-over{border-color:var(--blue);background:var(--blue-l)}
+.bi-handle{color:var(--t3);flex-shrink:0}
+.bi-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.bi-name{flex:1;font-size:13px;font-weight:700;color:var(--tx)}
+.bi-sub{font-size:10px;color:var(--t3);font-weight:500}
+.bi-del{width:26px;height:26px;border-radius:50%;border:none;background:var(--s2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);flex-shrink:0;font-size:14px;transition:all .15s}
+.bi-del:hover{background:#fee2e2;color:var(--red)}
+.builder-pool-label{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin:10px 0 7px}
+.builder-pool{display:flex;flex-wrap:wrap;gap:7px}
+.pool-item{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:50px;border:1.5px solid var(--bdr2);background:var(--sur);cursor:pointer;font-size:12px;font-weight:700;color:var(--t2);transition:all .15s}
+.pool-item:active{transform:scale(.94);background:var(--blue-l);border-color:var(--blue);color:var(--blue)}
+.pool-item.used{opacity:.35;pointer-events:none}
+
+/* ITEM SETTINGS POPOVER */
+.item-settings{margin:4px 0 0 40px;padding:10px 12px;border-radius:10px;background:var(--s2);border:1px solid var(--bdr);display:none}
+.item-settings.open{display:block}
+.is-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.is-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;min-width:52px}
+.is-inp{flex:1;padding:5px 8px;border-radius:7px;border:1.5px solid var(--bdr);background:var(--sur);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--tx);outline:none;min-width:0}
+.is-inp:focus{border-color:var(--blue)}
+.is-sel{flex:1;padding:5px 8px;border-radius:7px;border:1.5px solid var(--bdr);background:var(--sur);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--tx);outline:none}
+
 /* TOAST */
 .toast{position:fixed;bottom:calc(88px + var(--sb));left:50%;transform:translateX(-50%) translateY(20px);background:var(--tx);color:#fff;padding:11px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;opacity:0;transition:all .25s;white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -160,7 +193,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
     <span class="ob-wordmark">NewRun</span>
   </div>
   <h1 class="ob-h1">Track every<br><b>kilometre.</b></h1>
-  <p class="ob-sub">Accurate GPS tracking, beautiful run stories, share as real images.</p>
+  <p class="ob-sub">وَزَادَهُ بَسْطَةً فِى الْعِلْمِ وَالْجِسْمِ<br><span style="font-size:12px;opacity:.7">(QS Al-Baqarah: 247)</span></p>
   <div class="ob-form">
     <div>
       <div class="ob-lbl">Your name</div>
@@ -199,7 +232,21 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
     </div>
     <div class="sec-hd"><div class="sec-t">Your Runs</div><div class="sec-c" id="run-cnt"></div></div>
     <div id="feed"></div>
-    <div style="height:24px"></div>
+    <div style="height:16px"></div>
+    <!-- APP FOOTER -->
+    <div style="margin:0 16px 32px;padding:18px 16px;border-top:1px solid var(--bdr);text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:6px">
+        <div style="width:22px;height:22px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <span style="font-size:14px;font-weight:900;color:var(--tx);letter-spacing:-.3px">NewRun</span>
+      </div>
+      <div style="font-size:13px;color:var(--t2);font-weight:600;line-height:1.7;font-style:italic">
+        وَزَادَهُ بَسْطَةً فِى الْعِلْمِ وَالْجِسْمِ
+      </div>
+      <div style="font-size:10px;color:var(--t3);margin-top:2px">QS Al-Baqarah: 247</div>
+      <div style="margin-top:8px;font-size:10px;color:var(--t3);opacity:.6">v2.0 NewRun</div>
+    </div>
   </div>
 </div>
 
@@ -212,6 +259,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
   </div>
   <div id="run-map">
     <div class="gps-bar" id="gps-bar"><div class="gps-led" id="gps-led"></div><span id="gps-txt">Acquiring GPS…</span></div>
+    <!-- WakeLock indicator -->
+    <div class="wl-badge" id="wl-badge"><span>🔆</span><span>Screen awake</span></div>
   </div>
   <div class="live-panel">
     <div class="lv-row">
@@ -264,8 +313,17 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
       <input id="run-title" style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid var(--bdr);background:var(--sur);font-family:'Inter',sans-serif;font-size:15px;font-weight:700;color:var(--tx);outline:none;transition:border-color .2s" placeholder="Name this run…" maxlength="50" oninput="drawCard()">
     </div>
 
+    <!-- DRAG & DROP CARD BUILDER -->
+    <div class="builder-wrap">
+      <div class="builder-label">Card Layout — Drag to Reorder</div>
+      <div class="builder-note">Drag items to reorder. Tap ✕ to remove. Tap + items below to add back.</div>
+      <div class="builder-list" id="builder-list"></div>
+      <div class="builder-pool-label">Add Items</div>
+      <div class="builder-pool" id="builder-pool"></div>
+    </div>
+
     <!-- CANVAS PREVIEW -->
-    <div style="margin:0 16px 6px;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px">Share Card</div>
+    <div style="margin:0 16px 6px;font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.8px">Share Card Preview</div>
     <div id="cv-wrap" style="margin:0 16px 12px;border-radius:18px;overflow:hidden;box-shadow:var(--sh-lg);background:#000">
       <canvas id="sc" style="width:100%;display:block"></canvas>
     </div>
@@ -289,8 +347,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ── DB ──────────────────────────────────────────────────
-const DB_KEY='newrun3';
-let DB=(()=>{try{return JSON.parse(localStorage.getItem(DB_KEY))||{user:null,runs:[]};}catch(e){return{user:null,runs:[]};}})();
+const DB_KEY='newrun4';
+let DB=(()=>{try{return JSON.parse(localStorage.getItem(DB_KEY))||{user:null,runs:[],cardItems:null};}catch(e){return{user:null,runs:[],cardItems:null};}})();
 function saveDB(){try{localStorage.setItem(DB_KEY,JSON.stringify(DB));}catch(e){}}
 
 // ── SCREEN ─────────────────────────────────────────────
@@ -301,7 +359,7 @@ function checkOb(){document.getElementById('ob-btn').disabled=document.getElemen
 function startApp(){
   const n=document.getElementById('ob-name').value.trim();
   if(n.length<2)return;
-  DB.user={name:n,init:n.slice(0,2).toUpperCase()};
+  DB.user={name:n,init:n.slice(0,2).toUpperCase(),quote:'Every km counts.'};
   saveDB();initHome();show('s-home');
 }
 
@@ -349,7 +407,6 @@ function renderFeed(){
         </div>
       </div>
     </div>
-    <!-- Route canvas — pure vector, no map tiles -->
     <div style="background:#f0f4ff;border-top:1px solid var(--bdr);padding:4px 0 2px">
       <canvas id="mc-${r.id}" style="width:100%;display:block;height:108px"></canvas>
     </div>
@@ -358,17 +415,14 @@ function renderFeed(){
       <button class="pf-btn" onclick="shareRunCard(${r.id})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16,6 12,2 8,6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share</button>
     </div>
   </div>`).join('');
-
-  setTimeout(()=>{ DB.runs.slice().reverse().forEach(r=>drawMini('mc-'+r.id,r.coords)); },80);
+  setTimeout(()=>{DB.runs.slice().reverse().forEach(r=>drawMini('mc-'+r.id,r.coords));},80);
 }
 
-// Mini route canvas in feed
 function drawMini(cid,coords){
   const el=document.getElementById(cid);if(!el)return;
   const dpr=window.devicePixelRatio||1;
-  el.width=el.offsetWidth*dpr; el.height=el.offsetHeight*dpr;
-  const ctx=el.getContext('2d');
-  ctx.scale(dpr,dpr);
+  el.width=el.offsetWidth*dpr;el.height=el.offsetHeight*dpr;
+  const ctx=el.getContext('2d');ctx.scale(dpr,dpr);
   const lW=el.offsetWidth,lH=el.offsetHeight;
   ctx.fillStyle='#f0f4ff';ctx.fillRect(0,0,lW,lH);
   if(!coords||coords.length<2){
@@ -381,13 +435,10 @@ function drawMini(cid,coords){
   const scl=Math.min((lW-pad*2)/lnr,(lH-pad*2)/lr);
   const ox=lW/2-(minLn+lnr/2)*scl,oy=lH/2+(minLa+lr/2)*scl;
   const tx=ln=>ox+ln*scl,ty=la=>oy-la*scl;
-  // glow
   ctx.strokeStyle='rgba(37,99,235,.15)';ctx.lineWidth=9;ctx.lineCap='round';ctx.lineJoin='round';
   ctx.beginPath();coords.forEach((c,i)=>i?ctx.lineTo(tx(c.lng),ty(c.lat)):ctx.moveTo(tx(c.lng),ty(c.lat)));ctx.stroke();
-  // line
   ctx.strokeStyle='#2563EB';ctx.lineWidth=3;
   ctx.beginPath();coords.forEach((c,i)=>i?ctx.lineTo(tx(c.lng),ty(c.lat)):ctx.moveTo(tx(c.lng),ty(c.lat)));ctx.stroke();
-  // dots
   [[coords[0],'#10b981'],[coords[coords.length-1],'#ef4444']].forEach(([c,col])=>{
     ctx.fillStyle=col;ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.5;
     ctx.beginPath();ctx.arc(tx(c.lng),ty(c.lat),5,0,Math.PI*2);ctx.fill();ctx.stroke();
@@ -400,26 +451,47 @@ function delRun(id,ev){
   DB.runs=DB.runs.filter(r=>r.id!==id);saveDB();initHome();toast('🗑 Deleted');
 }
 
-// Share a saved run as an image card
 async function shareRunCard(id){
   const r=DB.runs.find(x=>x.id===id);if(!r)return;
   toast('⏳ Building card…');
-  // Build off-screen canvas
-  const cv=document.createElement('canvas');
-  cv.width=1080;cv.height=1920;
+  const cv=document.createElement('canvas');cv.width=1080;cv.height=1920;
   const ctx=cv.getContext('2d');
-  // Load photo if any
   let img=null;
-  if(r.photo){
-    img=await new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=r.photo;});
-  }
-  renderCardCtx(ctx,1080,1920,img,r.coords,r.dist,r.dur,r.kcal,r.title||'Morning Run',r.date);
+  if(r.photo){img=await loadImg(r.photo);}
+  const items=r.cardItems||DB.cardItems||defaultCardItems();
+  renderCardCtx(ctx,1080,1920,img,r.coords,r.dist,r.dur,r.kcal,r.title||'Morning Run',r.date,items,DB.user);
   cv.toBlob(async blob=>{
     if(!blob){toast('❌ Error');return;}
-    const fname=`newrun-${(r.title||'run').replace(/\s+/g,'-').toLowerCase()}.png`;
-    await exportBlob(blob,fname,`${r.dist.toFixed(2)}km 🏃 via NewRun`);
+    await exportBlob(blob,`newrun-${(r.title||'run').replace(/\s+/g,'-').toLowerCase()}.png`,`${r.dist.toFixed(2)}km 🏃 via NewRun`);
   },'image/png',1.0);
 }
+
+function loadImg(src){return new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src;});}
+
+// ── WAKE LOCK ──────────────────────────────────────────
+// FIX 1: Keep screen awake during recording
+let wakeLock=null;
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator))return;
+  try{
+    wakeLock=await navigator.wakeLock.request('screen');
+    document.getElementById('wl-badge').classList.add('on');
+    wakeLock.addEventListener('release',()=>{
+      document.getElementById('wl-badge').classList.remove('on');
+      wakeLock=null;
+    });
+  }catch(e){console.log('WakeLock denied:',e);}
+}
+async function releaseWakeLock(){
+  if(wakeLock){await wakeLock.release();wakeLock=null;}
+  document.getElementById('wl-badge').classList.remove('on');
+}
+// Re-acquire on visibility change (page re-focus)
+document.addEventListener('visibilitychange',async()=>{
+  if(recording&&!paused&&document.visibilityState==='visible'&&!wakeLock){
+    await requestWakeLock();
+  }
+});
 
 // ── GPS ────────────────────────────────────────────────
 let runMap=null,runPoly=null,runDot=null,runAcc=null;
@@ -445,7 +517,7 @@ function setGPS(s,t){
   document.getElementById('gps-led').className='gps-led'+(s==='locked'?' locked':s==='err'?' err':'');
   document.getElementById('gps-txt').textContent=t;
 }
-function startRec(){
+async function startRec(){
   if(!navigator.geolocation){toast('❌ GPS not available');return;}
   recording=true;paused=false;startTs=Date.now();elapsed=0;pausedMs=0;dist=0;kcal=0;coords=[];lastPt=null;
   runPoly.setLatLngs([]);if(runDot){runDot.remove();runDot=null;}if(runAcc){runAcc.remove();runAcc=null;}
@@ -453,6 +525,8 @@ function startRec(){
   document.getElementById('btn-stop').style.display='flex';
   document.getElementById('btn-pause').style.display='flex';
   setGPS('','Searching…');toast('📍 Recording started!');
+  // FIX 1: Request WakeLock so GPS keeps running when screen dims
+  await requestWakeLock();
   watchId=navigator.geolocation.watchPosition(onGPS,onGPSErr,{enableHighAccuracy:true,maximumAge:1000,timeout:15000});
   timerInt=setInterval(tick,1000);
 }
@@ -487,14 +561,16 @@ function togglePause(){
   if(paused){pauseTs=Date.now();document.getElementById('pause-ic').innerHTML='<polygon points="5,3 19,12 5,21" fill="currentColor"/>';setGPS('','Paused');toast('⏸ Paused');}
   else{pausedMs+=Date.now()-pauseTs;document.getElementById('pause-ic').innerHTML='<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';setGPS('locked','Resumed');toast('▶ Resumed');}
 }
-function stopRec(){
+async function stopRec(){
   if(!confirm('End this run?'))return;
   clearInterval(timerInt);if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null;}
-  recording=false;openPostEditor();
+  recording=false;
+  await releaseWakeLock();
+  openPostEditor();
 }
 function recenter(){if(lastPt)runMap.setView([lastPt.lat,lastPt.lng],17,{animate:true});}
-function confirmBack(){
-  if(recording){if(!confirm('Stop run and go back?'))return;clearInterval(timerInt);if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null;}recording=false;resetRun();}
+async function confirmBack(){
+  if(recording){if(!confirm('Stop run and go back?'))return;clearInterval(timerInt);if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null;}recording=false;await releaseWakeLock();resetRun();}
   show('s-home');
 }
 function resetRun(){
@@ -509,6 +585,135 @@ function resetRun(){
   dist=0;elapsed=0;kcal=0;coords=[];setGPS('','Acquiring GPS…');
   document.getElementById('gps-led').className='gps-led';
 }
+
+// ── CARD ITEMS DEFINITION ──────────────────────────────
+// FIX 2 & 4: Configurable drag-drop items
+const ITEM_DEFS={
+  distance:{id:'distance',label:'Distance',icon:'📏',color:'#dbeafe',sub:'km display',defaultSettings:{unit:'km'}},
+  time:    {id:'time',    label:'Time',    icon:'⏱️',color:'#dcfce7',sub:'duration'},
+  pace:    {id:'pace',    label:'Pace',    icon:'⚡',color:'#fef3c7',sub:'min/km'},
+  calories:{id:'calories',label:'Calories',icon:'🔥',color:'#fee2e2',sub:'kcal burned'},
+  route:   {id:'route',   label:'Route Map',icon:'🗺️',color:'#ede9fe',sub:'GPS path'},
+  user:    {id:'user',    label:'Runner Name',icon:'👤',color:'#f0fdf4',sub:'your profile'},
+  quote:   {id:'quote',   label:'Quote',  icon:'💬',color:'#fdf4ff',sub:'motivational text',defaultSettings:{text:''}},
+  date:    {id:'date',    label:'Date',   icon:'📅',color:'#fff7ed',sub:'run date'},
+  badge:   {id:'badge',   label:'Badge',  icon:'🏅',color:'#fef9c3',sub:'achievement icon'},
+};
+
+function defaultCardItems(){
+  return [
+    {id:'user',   settings:{}},
+    {id:'distance',settings:{}},
+    {id:'time',   settings:{}},
+    {id:'pace',   settings:{}},
+    {id:'calories',settings:{}},
+    {id:'route',  settings:{}},
+    {id:'quote',  settings:{text:DB.user?.quote||'Every km counts.'}},
+    {id:'date',   settings:{}},
+  ];
+}
+
+let cardItems=[]; // active items in editor
+
+function initBuilder(){
+  cardItems=JSON.parse(JSON.stringify(DB.cardItems||defaultCardItems()));
+  renderBuilder();
+}
+
+function renderBuilder(){
+  const list=document.getElementById('builder-list');
+  const pool=document.getElementById('builder-pool');
+  const usedIds=new Set(cardItems.map(x=>x.id));
+
+  // Active list
+  list.innerHTML='';
+  cardItems.forEach((item,idx)=>{
+    const def=ITEM_DEFS[item.id];if(!def)return;
+    const hasSettings=(item.id==='quote');
+    const el=document.createElement('div');
+    el.className='builder-item';
+    el.draggable=true;
+    el.dataset.idx=idx;
+    el.innerHTML=`
+      <span class="bi-handle" style="font-size:16px;cursor:grab">⠿</span>
+      <div class="bi-icon" style="background:${def.color};font-size:16px">${def.icon}</div>
+      <div style="flex:1">
+        <div class="bi-name">${def.label}</div>
+        <div class="bi-sub">${def.sub}</div>
+      </div>
+      ${hasSettings?`<button onclick="toggleSettings(${idx})" style="border:none;background:var(--s2);border-radius:7px;padding:4px 8px;font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;flex-shrink:0">⚙ Edit</button>`:''}
+      <button class="bi-del" onclick="removeItem(${idx})">✕</button>
+    `;
+    // Settings row
+    if(hasSettings){
+      const settingsEl=document.createElement('div');
+      settingsEl.className='item-settings';
+      settingsEl.id=`settings-${idx}`;
+      settingsEl.innerHTML=`
+        <div class="is-row">
+          <span class="is-lbl">Text</span>
+          <input class="is-inp" type="text" maxlength="80" placeholder="Your quote…" value="${(item.settings?.text||'').replace(/"/g,'&quot;')}" oninput="updateItemSetting(${idx},'text',this.value)">
+        </div>`;
+      list.appendChild(el);
+      list.appendChild(settingsEl);
+    }else{
+      list.appendChild(el);
+    }
+    // Drag events
+    el.addEventListener('dragstart',dragStart);
+    el.addEventListener('dragover',dragOver);
+    el.addEventListener('drop',dragDrop);
+    el.addEventListener('dragend',dragEnd);
+  });
+
+  // Pool
+  pool.innerHTML='';
+  Object.values(ITEM_DEFS).forEach(def=>{
+    const btn=document.createElement('button');
+    btn.className='pool-item'+(usedIds.has(def.id)?' used':'');
+    btn.innerHTML=`<span>${def.icon}</span><span>${def.label}</span>`;
+    btn.onclick=()=>addItem(def.id);
+    pool.appendChild(btn);
+  });
+}
+
+function toggleSettings(idx){
+  const el=document.getElementById(`settings-${idx}`);
+  if(el)el.classList.toggle('open');
+}
+
+function updateItemSetting(idx,key,val){
+  if(!cardItems[idx].settings)cardItems[idx].settings={};
+  cardItems[idx].settings[key]=val;
+  drawCard();
+}
+
+function removeItem(idx){
+  cardItems.splice(idx,1);
+  renderBuilder();drawCard();
+}
+
+function addItem(id){
+  if(cardItems.find(x=>x.id===id))return;
+  const settings={};
+  if(id==='quote')settings.text=DB.user?.quote||'Every km counts.';
+  cardItems.push({id,settings});
+  renderBuilder();drawCard();
+}
+
+// Drag & Drop
+let dragIdx=null;
+function dragStart(e){dragIdx=+e.currentTarget.dataset.idx;e.currentTarget.classList.add('dragging');}
+function dragOver(e){e.preventDefault();document.querySelectorAll('.builder-item').forEach(el=>el.classList.remove('drag-over'));e.currentTarget.classList.add('drag-over');}
+function dragDrop(e){
+  e.preventDefault();
+  const toIdx=+e.currentTarget.dataset.idx;
+  if(dragIdx===null||dragIdx===toIdx)return;
+  const moved=cardItems.splice(dragIdx,1)[0];
+  cardItems.splice(toIdx,0,moved);
+  renderBuilder();drawCard();dragIdx=null;
+}
+function dragEnd(e){e.currentTarget.classList.remove('dragging');document.querySelectorAll('.builder-item').forEach(el=>el.classList.remove('drag-over'));}
 
 // ── POST EDITOR ────────────────────────────────────────
 let picImg=null,picDataUrl=null;
@@ -527,15 +732,17 @@ function openPostEditor(){
   const dW=wrap.offsetWidth;
   cv.style.width=dW+'px';
   cv.style.height=Math.round(dW*CH/CW)+'px';
+  initBuilder();
   drawCard();
   show('s-post');
 }
 
 // ── CORE CANVAS RENDERER ───────────────────────────────
-function renderCardCtx(ctx,W,H,img,pts,runDist,runElapsed,runKcal,title,dateIso){
+// FIX 2: Route now properly below stats; FIX 4: items-driven layout
+function renderCardCtx(ctx,W,H,img,pts,runDist,runElapsed,runKcal,title,dateIso,items,user){
   ctx.clearRect(0,0,W,H);
 
-  // 1. BACKGROUND (photo or gradient)
+  // 1. BACKGROUND
   if(img){
     const ir=img.width/img.height,cr=W/H;
     let sx=0,sy=0,sw=img.width,sh=img.height;
@@ -543,107 +750,187 @@ function renderCardCtx(ctx,W,H,img,pts,runDist,runElapsed,runKcal,title,dateIso)
     ctx.drawImage(img,sx,sy,sw,sh,0,0,W,H);
   }else{
     const g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,'#050e1f');g.addColorStop(.5,'#0d2348');g.addColorStop(1,'#071428');
+    g.addColorStop(0,'#050e1f');g.addColorStop(.45,'#0a1f40');g.addColorStop(1,'#071428');
     ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    // subtle noise grain (optional)
+    // starfield dots
+    ctx.fillStyle='rgba(255,255,255,.25)';
+    for(let i=0;i<120;i++){ctx.beginPath();ctx.arc((Math.sin(i*137.5)*0.5+0.5)*W,(Math.cos(i*97.3)*0.5+0.5)*H,Math.random()<.1?2:1,0,Math.PI*2);ctx.fill();}
   }
 
-  // 2. GRADIENT OVERLAYS
-  // top scrim
-  const tg=ctx.createLinearGradient(0,0,0,H*.55);
-  tg.addColorStop(0,'rgba(0,0,0,.62)');tg.addColorStop(1,'rgba(0,0,0,0)');
+  // 2. OVERLAYS
+  const tg=ctx.createLinearGradient(0,0,0,H*.5);
+  tg.addColorStop(0,'rgba(0,0,0,.72)');tg.addColorStop(1,'rgba(0,0,0,0)');
   ctx.fillStyle=tg;ctx.fillRect(0,0,W,H);
-  // bottom scrim
-  const bg=ctx.createLinearGradient(0,H*.6,0,H);
-  bg.addColorStop(0,'rgba(0,0,0,0)');bg.addColorStop(1,'rgba(0,0,0,.65)');
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const bg2=ctx.createLinearGradient(0,H*.55,0,H);
+  bg2.addColorStop(0,'rgba(0,0,0,0)');bg2.addColorStop(1,'rgba(0,0,0,.75)');
+  ctx.fillStyle=bg2;ctx.fillRect(0,0,W,H);
 
-  // 3. STATS — Strava-like layout (top third)
-  const pace=(runDist>0.05&&runElapsed>0)?
-    (s=>{const m=Math.floor(s/60),sc=Math.floor(s%60);return m+':'+(sc<10?'0':'')+sc;})(runElapsed/runDist)
-    :'--:--';
+  // 3. Render each item in order
+  const pace=(runDist>0.05&&runElapsed>0)?calcPace(runElapsed,runDist):'--:--';
+  const ds=new Date(dateIso||Date.now()).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
-  ctx.textAlign='center';ctx.textBaseline='alphabetic';
+  // Layout constants
+  const PAD=72;
+  let curY=H*0.095;
 
-  const sy=H*0.12;
-  // Distance
-  lbl(ctx,'Distance',W/2,sy,50);
-  big(ctx,runDist.toFixed(2)+' km',W/2,sy+150,130);
-  // Pace
-  lbl(ctx,'Pace',W/2,sy+230,50);
-  big(ctx,pace+' /km',W/2,sy+380,130);
-  // Time
-  lbl(ctx,'Time',W/2,sy+460,50);
-  big(ctx,fmtTime(runElapsed),W/2,sy+608,130);
-
-  // 4. GPS ROUTE (vector) — centre of card, below stats
-  if(pts&&pts.length>=2){
-    drawRouteVec(ctx,pts,W,H,W*.50,H*.735,W*.50,H*.125);
+  // Badge item (always top right if enabled)
+  if(items.find(x=>x.id==='badge')){
+    ctx.save();
+    ctx.font='bold 90px sans-serif';ctx.textAlign='right';ctx.textBaseline='top';
+    ctx.fillText('🏃',W-PAD,curY);
+    ctx.restore();
   }
 
-  // 5. BRANDING
-  const bY=H*.892;
+  for(const item of items){
+    if(!item||!item.id)continue;
+    const id=item.id;
+    const s=item.settings||{};
+
+    if(id==='user'){
+      // Avatar circle + name
+      const cx=PAD+56,cy=curY+56;
+      ctx.save();
+      ctx.beginPath();ctx.arc(cx,cy,56,0,Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,.15)';ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=4;ctx.stroke();
+      ctx.font='900 52px Inter,sans-serif';ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(user?.init||'?',cx,cy);
+      ctx.restore();
+      ctx.textAlign='left';ctx.textBaseline='alphabetic';
+      ctx.font='700 44px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.9)';
+      ctx.fillText(user?.name||'Runner',PAD+130,curY+52);
+      ctx.font='500 32px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.5)';
+      ctx.fillText('via NewRun',PAD+130,curY+100);
+      curY+=160;
+
+    }else if(id==='distance'){
+      ctx.textAlign='center';
+      lbl(ctx,'Distance',W/2,curY+44,44);
+      big(ctx,runDist.toFixed(2)+' km',W/2,curY+188,156);
+      curY+=220;
+
+    }else if(id==='time'){
+      ctx.textAlign='center';
+      lbl(ctx,'Time',W/2,curY+44,44);
+      big(ctx,fmtTime(runElapsed),W/2,curY+188,156);
+      curY+=220;
+
+    }else if(id==='pace'){
+      ctx.textAlign='center';
+      lbl(ctx,'Pace',W/2,curY+44,44);
+      big(ctx,pace+' /km',W/2,curY+188,120);
+      curY+=220;
+
+    }else if(id==='calories'){
+      ctx.textAlign='center';
+      lbl(ctx,'Calories',W/2,curY+44,44);
+      big(ctx,runKcal+' kcal',W/2,curY+188,120);
+      curY+=220;
+
+    }else if(id==='route'){
+      // FIX 2: Route map is placed here in flow (below time/pace etc.)
+      if(pts&&pts.length>=2){
+        const rH=H*0.18;
+        const rW=W-PAD*2;
+        drawRouteVec(ctx,pts,W,H,rW,rH,W/2,curY+rH/2+24);
+        curY+=rH+60;
+      }else{
+        ctx.textAlign='center';ctx.font='500 34px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.3)';
+        ctx.fillText('No GPS route recorded',W/2,curY+60);
+        curY+=100;
+      }
+
+    }else if(id==='quote'){
+      const qt=s.text||user?.quote||'Every km counts.';
+      ctx.textAlign='center';
+      // quote mark
+      ctx.font='900 100px Georgia,serif';ctx.fillStyle='rgba(251,146,60,.45)';
+      ctx.fillText('"',W/2-280,curY+70);
+      ctx.font='600 italic 40px Georgia,serif';ctx.fillStyle='rgba(255,255,255,.72)';
+      wrapText(ctx,qt,W/2,curY+50,W-PAD*2.5,54);
+      curY+=130;
+
+    }else if(id==='date'){
+      ctx.textAlign='center';
+      ctx.font='500 36px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.38)';
+      ctx.fillText(ds,W/2,curY+44);
+      curY+=80;
+    }
+    // badge is handled above
+    curY+=20; // spacing between items
+  }
+
+  // FIX 5: BRANDING FOOTER
+  const footY=H-120;
+  // divider line
+  ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(PAD,footY-30);ctx.lineTo(W-PAD,footY-30);ctx.stroke();
+
   ctx.textAlign='center';ctx.textBaseline='alphabetic';
-  ctx.font='900 64px Inter,sans-serif';
-  ctx.fillStyle='rgba(255,255,255,.92)';
-  ctx.letterSpacing='6px';
-  ctx.fillText('NEWRUN',W/2,bY);
+  ctx.font='900 48px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.letterSpacing='8px';
+  ctx.fillText('NEWRUN',W/2,footY+10);
   ctx.letterSpacing='0px';
+  ctx.font='500 28px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';
+  ctx.fillText('',W/2,footY+52);
 
-  ctx.font='600 40px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.60)';
-  ctx.fillText(title,W/2,bY+62);
-
-  const ds=new Date(dateIso||Date.now()).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  ctx.font='500 32px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.36)';
-  ctx.fillText(ds,W/2,bY+110);
+  // run title overlay
+  ctx.font='700 36px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.55)';
+  ctx.fillText(title,W/2,footY+88);
 }
+
+function calcPace(sec,km){const s=sec/km;const m=Math.floor(s/60),sc=Math.floor(s%60);return m+':'+(sc<10?'0':'')+sc;}
 
 function lbl(ctx,t,x,y,sz){
   ctx.font=`600 ${sz}px Inter,sans-serif`;
-  ctx.fillStyle='rgba(255,255,255,.68)';
-  ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.58)';
+  ctx.shadowBlur=0;ctx.textBaseline='alphabetic';
   ctx.fillText(t,x,y);
 }
 function big(ctx,t,x,y,sz){
   ctx.font=`900 ${sz}px Inter,sans-serif`;
-  ctx.fillStyle='#fff';
-  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=30;
+  ctx.fillStyle='#fff';ctx.textBaseline='alphabetic';
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=40;
   ctx.fillText(t,x,y);
   ctx.shadowBlur=0;
 }
 
-// Vector route drawing — no map tiles
+// Word-wrap helper
+function wrapText(ctx,text,x,y,maxW,lineH){
+  const words=text.split(' ');let line='';let ly=y;
+  for(const w of words){
+    const test=line?line+' '+w:w;
+    if(ctx.measureText(test).width>maxW&&line){ctx.fillText(line,x,ly);line=w;ly+=lineH;}
+    else line=test;
+  }
+  if(line)ctx.fillText(line,x,ly);
+}
+
 function drawRouteVec(ctx,pts,W,H,routeW,routeH,cx,cy){
   let minLa=Infinity,maxLa=-Infinity,minLn=Infinity,maxLn=-Infinity;
   pts.forEach(p=>{minLa=Math.min(minLa,p.lat);maxLa=Math.max(maxLa,p.lat);minLn=Math.min(minLn,p.lng);maxLn=Math.max(maxLn,p.lng);});
   const lr=maxLa-minLa||.001,lnr=maxLn-minLn||.001;
-  const scl=Math.min(routeW/lnr,routeH/lr)*.88;
+  const scl=Math.min(routeW/lnr,routeH/lr)*.82;
   const ox=cx-(minLn+lnr/2)*scl,oy=cy+(minLa+lr/2)*scl;
   const tx=ln=>ox+ln*scl,ty=la=>oy-la*scl;
-
   ctx.save();
-  // outer glow
-  ctx.strokeStyle='rgba(251,146,60,.28)';ctx.lineWidth=38;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeStyle='rgba(251,146,60,.22)';ctx.lineWidth=44;ctx.lineCap='round';ctx.lineJoin='round';
   ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(tx(p.lng),ty(p.lat)):ctx.moveTo(tx(p.lng),ty(p.lat)));ctx.stroke();
-  // mid glow
-  ctx.strokeStyle='rgba(251,146,60,.50)';ctx.lineWidth=22;
+  ctx.strokeStyle='rgba(251,146,60,.55)';ctx.lineWidth=22;
   ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(tx(p.lng),ty(p.lat)):ctx.moveTo(tx(p.lng),ty(p.lat)));ctx.stroke();
-  // main line
-  ctx.strokeStyle='#FB923C';ctx.lineWidth=11;
+  ctx.strokeStyle='#FB923C';ctx.lineWidth=12;
   ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(tx(p.lng),ty(p.lat)):ctx.moveTo(tx(p.lng),ty(p.lat)));ctx.stroke();
   ctx.restore();
-
-  // start dot
   ctx.fillStyle='#4ade80';ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=5;
   ctx.beginPath();ctx.arc(tx(pts[0].lng),ty(pts[0].lat),18,0,Math.PI*2);ctx.fill();ctx.stroke();
-  // end dot
   ctx.fillStyle='#f87171';ctx.beginPath();ctx.arc(tx(pts[pts.length-1].lng),ty(pts[pts.length-1].lat),18,0,Math.PI*2);ctx.fill();ctx.stroke();
 }
 
 function drawCard(){
   const cv=document.getElementById('sc');if(!cv)return;
   renderCardCtx(cv.getContext('2d'),CW,CH,picImg,coords,dist,elapsed,kcal,
-    document.getElementById('run-title')?.value||autoTitle(),new Date().toISOString());
+    document.getElementById('run-title')?.value||autoTitle(),
+    new Date().toISOString(),cardItems,DB.user);
 }
 
 // PHOTO
@@ -656,7 +943,6 @@ function onPic(e){
   fr.onload=ev=>{
     const im=new Image();
     im.onload=()=>{
-      // Keep up to 2160px wide
       const c=document.createElement('canvas');
       let w=im.width,h=im.height;if(w>2160){h=Math.round(h*2160/w);w=2160;}
       c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
@@ -672,6 +958,8 @@ function onPic(e){
 
 // SHARE
 async function doShare(){
+  // Save card layout preference
+  DB.cardItems=JSON.parse(JSON.stringify(cardItems));saveDB();
   drawCard();
   await new Promise(r=>setTimeout(r,80));
   const cv=document.getElementById('sc');
@@ -691,7 +979,6 @@ async function exportBlob(blob,fname,shareText){
       catch(err){if(err.name==='AbortError')return;}
     }
   }
-  // Fallback: download
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download=fname;
   document.body.appendChild(a);a.click();document.body.removeChild(a);
@@ -701,8 +988,10 @@ async function exportBlob(blob,fname,shareText){
 
 function publishPost(){
   const title=document.getElementById('run-title').value.trim()||autoTitle();
+  DB.cardItems=JSON.parse(JSON.stringify(cardItems));
   const run={id:Date.now(),date:new Date().toISOString(),title,dist,dur:elapsed,kcal,
-    coords:coords.slice(),photo:picDataUrl,caption:document.getElementById('cap').value.trim()};
+    coords:coords.slice(),photo:picDataUrl,caption:document.getElementById('cap').value.trim(),
+    cardItems:JSON.parse(JSON.stringify(cardItems))};
   DB.runs.push(run);saveDB();resetRun();initHome();show('s-home');toast('🎉 Run posted!');
 }
 function discardPost(){if(!confirm('Discard this run?'))return;resetRun();show('s-home');}
@@ -719,7 +1008,7 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 window.addEventListener('load',()=>{
   if(DB.user){initHome();show('s-home');}else show('s-ob');
   if('serviceWorker' in navigator){
-    const sw=`const C='nr3';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{if(new URL(e.request.url).hostname.includes('tile.openstreetmap.org')){e.respondWith(caches.open('tiles').then(async c=>{const v=await c.match(e.request);if(v)return v;try{const r=await fetch(e.request);c.put(e.request,r.clone());return r;}catch{return v||new Response('',{status:503});}}));return;}e.respondWith(fetch(e.request).catch(()=>new Response('',{status:503})));});`;
+    const sw=`const C='nr4';self.addEventListener('install',e=>{self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});self.addEventListener('fetch',e=>{if(new URL(e.request.url).hostname.includes('tile.openstreetmap.org')){e.respondWith(caches.open('tiles').then(async c=>{const v=await c.match(e.request);if(v)return v;try{const r=await fetch(e.request);c.put(e.request,r.clone());return r;}catch{return v||new Response('',{status:503});}}));return;}e.respondWith(fetch(e.request).catch(()=>new Response('',{status:503})));});`;
     navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).catch(()=>{});
   }
 });
