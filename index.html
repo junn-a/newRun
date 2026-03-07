@@ -399,7 +399,7 @@ function renderFeed(){
         <div class="pc-badge">🏃 Run</div>
       </div>
       <div class="pc-bot">
-       
+        <div class="pc-rname">${r.title||'Morning Run'}</div>
         <div class="pc-stats">
           <div class="pcs"><div class="pcs-v">${r.dist.toFixed(2)}</div><div class="pcs-l">km</div></div>
           <div class="pcs"><div class="pcs-v">${fmtTime(r.dur)}</div><div class="pcs-l">time</div></div>
