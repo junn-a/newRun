@@ -245,7 +245,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'Inter',s
         وَزَادَهُ بَسْطَةً فِى الْعِلْمِ وَالْجِسْمِ
       </div>
       <div style="font-size:10px;color:var(--t3);margin-top:2px">QS Al-Baqarah: 247</div>
-      <div style="margin-top:8px;font-size:10px;color:var(--t3);opacity:.6">v2.0 NewRun</div>
+      <div style="margin-top:8px;font-size:10px;color:var(--t3);opacity:.6">v2.0 · Made with ❤️</div>
     </div>
   </div>
 </div>
@@ -399,7 +399,6 @@ function renderFeed(){
         <div class="pc-badge">🏃 Run</div>
       </div>
       <div class="pc-bot">
-        <div class="pc-rname">${r.title||'Morning Run'}</div>
         <div class="pc-stats">
           <div class="pcs"><div class="pcs-v">${r.dist.toFixed(2)}</div><div class="pcs-l">km</div></div>
           <div class="pcs"><div class="pcs-v">${fmtTime(r.dur)}</div><div class="pcs-l">time</div></div>
@@ -459,7 +458,7 @@ async function shareRunCard(id){
   let img=null;
   if(r.photo){img=await loadImg(r.photo);}
   const items=r.cardItems||DB.cardItems||defaultCardItems();
-  //renderCardCtx(ctx,1080,1920,img,r.coords,r.dist,r.dur,r.kcal,r.title||'Morning Run',r.date,items,DB.user);
+  renderCardCtx(ctx,1080,1920,img,r.coords,r.dist,r.dur,r.kcal,r.title||'Morning Run',r.date,items,DB.user);
   cv.toBlob(async blob=>{
     if(!blob){toast('❌ Error');return;}
     await exportBlob(blob,`newrun-${(r.title||'run').replace(/\s+/g,'-').toLowerCase()}.png`,`${r.dist.toFixed(2)}km 🏃 via NewRun`);
@@ -872,7 +871,7 @@ function renderCardCtx(ctx,W,H,img,pts,runDist,runElapsed,runKcal,title,dateIso,
   ctx.fillText('NEWRUN',W/2,footY+10);
   ctx.letterSpacing='0px';
   ctx.font='500 28px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.35)';
-  ctx.fillText('',W/2,footY+52);
+  ctx.fillText('newrun.app · Track. Share. Inspire.',W/2,footY+52);
 
   // run title overlay
   ctx.font='700 36px Inter,sans-serif';ctx.fillStyle='rgba(255,255,255,.55)';
@@ -1000,7 +999,7 @@ function discardPost(){if(!confirm('Discard this run?'))return;resetRun();show('
 function haversine(a,b,c,d){const R=6371000,da=(c-a)*Math.PI/180,db=(d-b)*Math.PI/180,e=Math.sin(da/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(db/2)**2;return R*2*Math.atan2(Math.sqrt(e),Math.sqrt(1-e));}
 function fmtTime(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;return h>0?`${h}:${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`:`${String(m).padStart(2,'0')}:${String(sc).padStart(2,'0')}`;}
 function fmtDate(iso){const d=new Date(iso),now=new Date(),df=now-d;if(df<60000)return'Just now';if(df<3600000)return Math.floor(df/60000)+'m ago';if(df<86400000)return'Today '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});if(df<172800000)return'Yesterday';return d.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});}
-//function autoTitle(){const h=new Date().getHours();return h<7?'Early Morning Run':h<12?'Morning Run':h<15?'Midday Run':h<19?'Afternoon Run':'Evening Run';}
+function autoTitle(){const h=new Date().getHours();return h<7?'Early Morning Run':h<12?'Morning Run':h<15?'Midday Run':h<19?'Afternoon Run':'Evening Run';}
 let _tt=null;
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');if(_tt)clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2600);}
 
